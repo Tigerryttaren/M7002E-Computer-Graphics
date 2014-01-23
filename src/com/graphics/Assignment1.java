@@ -1,9 +1,11 @@
 package com.graphics;
 
-import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
-import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
-import static javax.media.opengl.GL.GL_TRIANGLES;
+import static javax.media.opengl.GL2.GL_DEPTH_BUFFER_BIT;
+import static javax.media.opengl.GL2.GL_FRONT_AND_BACK;
+import static javax.media.opengl.GL2.GL_ALL_ATTRIB_BITS;
+import static javax.media.opengl.GL2.GL_TRIANGLES;
 import static javax.media.opengl.GL2.GL_QUADS;
+import static javax.media.opengl.GL2.GL_LINE_LOOP;
 import static javax.media.opengl.GL2GL3.GL_LINE;
 import static javax.media.opengl.GL2GL3.GL_FILL;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
@@ -120,21 +122,28 @@ public class Assignment1 implements GLEventListener {
 		drawPyramid(gl, drawable);
 		drawSquare(gl, drawable);
 		drawStar(gl, drawable);
-			
 	}
 	
 	private void drawPyramid(GL2 gl, GLAutoDrawable drawable) {
+		// Pushing to matrix stack
+		gl.glPushMatrix();
+		
 		// PYRAMID 
 		// Resetting the Model-View matrix
-	    gl.glLoadIdentity();                 
+	    gl.glLoadIdentity();      
+	    
 	    // Moves the figure in the (x, y, z)-axis
-	    gl.glTranslatef(-3.0f, 0.0f, -8.0f); 		
+	    gl.glTranslatef(-3.0f, 0.0f, -8.0f); 	
+	    
 	    // Makes only the outlines
 	    gl.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);			
 			    
 	    // BEGIN Pyramid
 	    gl.glBegin(GL_TRIANGLES); 
-	 
+	    
+	    // Pushing current color to stack
+	    gl.glPushAttrib(GL_ALL_ATTRIB_BITS);
+	    
 	    // Set color to RED
 	    gl.glColor3f(1.0f, 0.0f, 0.0f);
 	    
@@ -160,54 +169,81 @@ public class Assignment1 implements GLEventListener {
 	 
 	    // END Pyramid
 	    gl.glEnd(); 
+	    
+	    gl.glPopAttrib();
+	    gl.glPopMatrix();
 	}
+	
 	private void drawSquare(GL2 gl, GLAutoDrawable drawable) {
+		// Pushing to matrix stack
+		gl.glPushMatrix();
+				
 		// SQUARE
 		// Resetting the Model-View matrix
-	    gl.glLoadIdentity();                 
+	    gl.glLoadIdentity(); 
+	    
 	    // Moves the figure in the (x, y, z)-axis
-	    gl.glTranslatef(0.0f, 0.0f, -8.0f); 		
-	    // Makes only the outlines
+	    gl.glTranslatef(0.0f, 0.0f, -10.0f); 
+	    
+	    // Makes so that square is filled in
 	    gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);		
 			    
 	    // BEGIN Square
 	    gl.glBegin(GL_QUADS); 
 	 
-	    // Set color to BLUE
-	    gl.glColor3f(0.0f, 0.0f, 1.0f); 
+	    // Pushing to attribute stack
+	    gl.glPushAttrib(GL_ALL_ATTRIB_BITS);
 	    
-	    // Front quad
+	    // Set color to BLUE
+	    gl.glColor3f(0.0f, 0.0f, 1.0f);
+	    
+	    // The Quad
 	    gl.glVertex3f(1.0f, 1.0f, 1.0f);
 	    gl.glVertex3f(-1.0f, 1.0f, 1.0f);
 	    gl.glVertex3f(-1.0f, -1.0f, 1.0f);
 	    gl.glVertex3f(1.0f, -1.0f, 1.0f);
 	    
 	    // END Square
-	    gl.glEnd(); 
+	    gl.glEnd();
 	    
-	  
-		
+	    gl.glPopAttrib();
+	    gl.glPopMatrix();
 	}
+	
 	private void drawStar(GL2 gl, GLAutoDrawable drawable) {
-		//TODO: Star
+		// Pushing to matrix stack
+		gl.glPushMatrix();
+				
 		// STAR
 		// Resetting the Model-View matrix
-		gl.glLoadIdentity();                 
-		// Moves the figure in the (x, y, z)-axis
-		gl.glTranslatef(0.0f, 0.0f, -8.0f); 		
-		// Makes only the outlines
-		gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);		
-					    
-		// BEGIN Star
-		//TODO_ How to star?
-		gl.glBegin(GL_QUADS); 
+		gl.glLoadIdentity();           
 		
+		// Moves the figure in the (x, y, z)-axis
+		gl.glTranslatef(3.0f, 0.0f, -8.0f); 
+					    
+		// BEGIN Star 
+		gl.glBegin (GL_LINE_LOOP); 
+		
+		// Pushing to attribute stack
+	    gl.glPushAttrib(GL_ALL_ATTRIB_BITS);
+	    
 		// Set color to GREEN
 		gl.glColor3f(0.0f, 1.0f, 0.0f);
 		
-		//TODO: Draw the sides
+		// Draw the sides
+		gl.glVertex3f(0.0f, 1.0f, 0.0f);
+		gl.glVertex3f(0.2f, 0.2f, 0.0f);
+		gl.glVertex3f(1.0f, 0.0f ,0.0f);
+		gl.glVertex3f(0.2f, -0.2f, 0.0f);
+		gl.glVertex3f(0.0f, -1.0f, 0.0f);
+		gl.glVertex3f(-0.2f, -0.2f, 0.0f);
+		gl.glVertex3f(-1.0f, 0.0f, 0.0f);
+		gl.glVertex3f(-0.2f, 0.2f, 0.0f);
 		
 		// END Star
 	    gl.glEnd(); 
+	    
+	    gl.glPopAttrib();
+	    gl.glPopMatrix();
 	}
 }
