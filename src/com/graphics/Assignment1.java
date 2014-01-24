@@ -31,7 +31,6 @@ public class Assignment1 implements GLEventListener {
 	private GLU glu;  
 	
 	public static void main(String[] args) {
-		
 		// Initialization
 		// Setting up GL
 		GLProfile.initSingleton(); 
@@ -58,8 +57,17 @@ public class Assignment1 implements GLEventListener {
 
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		//update();
-		render(drawable);
+		GL2 gl = drawable.getGL().getGL2();
+		
+		// Clearing the buffers
+		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+		gl.glClear(GL_DEPTH_BUFFER_BIT);
+		
+		// Drawing the figures
+		// This easily allows for drawing additional figures of the same types as implemented, just copy the line and change the translation values
+		drawPyramid(gl, drawable, -3.0f, 0.0f, -8.0f);
+		drawSquare(gl, drawable, 0.0f, 0.0f, -10.0f);
+		drawStar(gl, drawable, 3.0f, 0.0f, -8.0f);
 	}
 
 	@Override
@@ -76,12 +84,8 @@ public class Assignment1 implements GLEventListener {
 	@Override
 	public void reshape(GLAutoDrawable drawable, int arg1, int arg2, int width, int height) {
 		 GL2 gl = drawable.getGL().getGL2();
-		 
-		 // Prevents division by 0
-	     if (height == 0) { 
-	    	 height = 1;
-	     }
-	     // Computing the aspect
+	
+	     // Computing the aspect ratio
 	     float aspect = (float)width / height;
 	 
 	     // Setting the viewport, the area that is displayed, to cover the whole window
@@ -105,33 +109,12 @@ public class Assignment1 implements GLEventListener {
 	     gl.glLoadIdentity();
 	}
 	
-	// Support Methods
-	/*private void update() {
-		// Pass
-	}*/
-	
-	private void render(GLAutoDrawable drawable) {
-		GL2 gl = drawable.getGL().getGL2();
-		
-		// Clearing the buffers
-		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-		gl.glClear(GL_DEPTH_BUFFER_BIT);
-		
-		// Drawing the figures
-		// This easily allows for drawing additional figures of the same types as implemented, just copy the line and change the translation values
-		drawPyramid(gl, drawable, -3.0f, 0.0f, -8.0f);
-		drawSquare(gl, drawable, 0.0f, 0.0f, -10.0f);
-		drawStar(gl, drawable, 3.0f, 0.0f, -8.0f);
-	}
-	
+	// Support Methods	
 	private void drawPyramid(GL2 gl, GLAutoDrawable drawable, Float x, Float y, Float z) {
 		// Pushing to matrix stack
 		gl.glPushMatrix();
 		
-		// PYRAMID 
-		// Resetting the Model-View matrix
-	    //gl.glLoadIdentity();      
-	    
+		// PYRAMID
 	    // Moves the figure in the (x, y, z)-axis
 	    gl.glTranslatef(x, y, z); 	
 	    
@@ -182,10 +165,7 @@ public class Assignment1 implements GLEventListener {
 		// Pushing to matrix stack
 		gl.glPushMatrix();
 				
-		// SQUARE
-		// Resetting the Model-View matrix
-	    //gl.glLoadIdentity(); 
-	    
+		// SQUARE	    
 	    // Moves the figure in the (x, y, z)-axis
 	    gl.glTranslatef(x, y, z); 
 	    
@@ -220,9 +200,6 @@ public class Assignment1 implements GLEventListener {
 		gl.glPushMatrix();
 				
 		// STAR
-		// Resetting the Model-View matrix
-		//gl.glLoadIdentity();           
-		
 		// Moves the figure in the (x, y, z)-axis
 		gl.glTranslatef(x, y, z); 
 					    
