@@ -4,32 +4,22 @@ Student project at Luleå Tekniska Universitet.
 
 Lab 1
 =======================
-Derpa derpa
-dpera
+Required features implemented:
 
-Kittehs
------------------------
-HOhohohohohoh
-ihihih
-ihihi
+##### Outlines of a Square-based Pyramid
+The outlines of a red square based pyramid has been drawn. 
 
-### Header 
-HOhohohohohoh
-ihihih
-ihihi
-## Header
-HOhohohohohoh
-ihihih
-ihihi
-# Header
-Features implemented:
-* Draws the outline of a square based pyramid.
-* Draws a filled in blue square.
-* Draws a green star (any kind of star you want).
-* Has code that allows you to easily create additional squares, stars, and pyramids.
-* Preserves the openGL state, therefore your openGL commands will need to be encapsulated
-in a way that the openGL state before one of your shapes is drawn, is preserved after the
-shape is drawn. See glPushAttrib(), glPushMatrix(), glPopAttrib(), glPopMatrix().
+##### Blue Filled-in Square
+A blue filled in square has been drawn.
+
+##### Any Kind of Green Star
+A green star has been drawn. A four-pointed star was chosen because it is very easy do draw compared to a five-pointed star, for example. 
+
+##### Easy Creation of Additional Figures
+I've designed the code so that the drawing of the figures are done in functions, which can easily be called on to make additional figures. 
+
+##### Preserves the OpenGL State
+Ive used the functions *glPushAttrib()*, *glPushMatrix()*, *glPopAttrib()*, and *glPopMatrix()*, for preserving the openGL state before translating or rotating the figures, and also before changing attributes such as colors.
 
 Lab 2
 =======================

@@ -130,7 +130,7 @@ public class Assignment1 implements GLEventListener {
 		
 		// PYRAMID 
 		// Resetting the Model-View matrix
-	    gl.glLoadIdentity();      
+	    //gl.glLoadIdentity();      
 	    
 	    // Moves the figure in the (x, y, z)-axis
 	    gl.glTranslatef(x, y, z); 	
@@ -184,7 +184,7 @@ public class Assignment1 implements GLEventListener {
 				
 		// SQUARE
 		// Resetting the Model-View matrix
-	    gl.glLoadIdentity(); 
+	    //gl.glLoadIdentity(); 
 	    
 	    // Moves the figure in the (x, y, z)-axis
 	    gl.glTranslatef(x, y, z); 
@@ -221,7 +221,7 @@ public class Assignment1 implements GLEventListener {
 				
 		// STAR
 		// Resetting the Model-View matrix
-		gl.glLoadIdentity();           
+		//gl.glLoadIdentity();           
 		
 		// Moves the figure in the (x, y, z)-axis
 		gl.glTranslatef(x, y, z); 
