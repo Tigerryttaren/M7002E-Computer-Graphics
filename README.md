@@ -6,14 +6,16 @@ Lab 1
 =======================
 Required features implemented:
 
-** Outlines of a Square-based Pyramid** 
-
+**Outlines of a Square-based Pyramid** 
 The outlines of a red square based pyramid has been drawn. 
 
-##### Blue Filled-in Square
+**Blue Filled-in Square**
+
 A blue filled in square has been drawn.
 
-##### Any Kind of Green Star
+**Any Kind of Green Star**
+
+
 A green star has been drawn. A four-pointed star was chosen because it is very easy do draw compared to a five-pointed star, for example. 
 
 ##### Easy Creation of Additional Figures
