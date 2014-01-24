@@ -9,8 +9,7 @@ Required features implemented:
 **Outlines of a Square-based Pyramid** 
 The outlines of a red square based pyramid has been drawn. 
 
-**Blue Filled-in Square**
-
+Blue Filled-in Square
 A blue filled in square has been drawn.
 
 **Any Kind of Green Star**
