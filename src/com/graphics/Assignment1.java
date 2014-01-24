@@ -58,7 +58,7 @@ public class Assignment1 implements GLEventListener {
 
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		update();
+		//update();
 		render(drawable);
 	}
 
@@ -90,6 +90,7 @@ public class Assignment1 implements GLEventListener {
 	     // Setting the perspective projection with an aspect that matches that of the viewport
 	     // Choose Projection Matrix	
 	     gl.glMatrixMode(GL_PROJECTION);  
+	     
 	     // Resets the Projection Matrix	
 	     gl.glLoadIdentity();  
 	     
@@ -100,19 +101,14 @@ public class Assignment1 implements GLEventListener {
 	     // zNear : Specifies the distance from the viewer to the near clipping plane (always positive).
 	     // zFar : Specifies the distance from the viewer to the far clipping plane (always positive).
 	     glu.gluPerspective(45.0, aspect, 0.1, 100.0);
-	 
-	     // Enable the model-view transform
 	     gl.glMatrixMode(GL_MODELVIEW);
 	     gl.glLoadIdentity();
-	     
-	   
-	     
 	}
 	
 	// Support Methods
-	private void update() {
+	/*private void update() {
 		// Pass
-	}
+	}*/
 	
 	private void render(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
@@ -138,6 +134,9 @@ public class Assignment1 implements GLEventListener {
 	    
 	    // Moves the figure in the (x, y, z)-axis
 	    gl.glTranslatef(x, y, z); 	
+	    
+	    // Rotates the pyramid, just for "fun"
+	    gl.glRotatef(-55.0f, 0.0f, 1.0f, 0.0f);
 	    
 	    // Makes only the outlines
 	    gl.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);			
@@ -174,6 +173,7 @@ public class Assignment1 implements GLEventListener {
 	    // END Pyramid
 	    gl.glEnd(); 
 	    
+	    // Popping state
 	    gl.glPopAttrib();
 	    gl.glPopMatrix();
 	}
@@ -210,6 +210,7 @@ public class Assignment1 implements GLEventListener {
 	    // END Square
 	    gl.glEnd();
 	    
+	    // Popping state
 	    gl.glPopAttrib();
 	    gl.glPopMatrix();
 	}
@@ -247,6 +248,7 @@ public class Assignment1 implements GLEventListener {
 		// END Star
 	    gl.glEnd(); 
 	    
+	    // Popping state
 	    gl.glPopAttrib();
 	    gl.glPopMatrix();
 	}

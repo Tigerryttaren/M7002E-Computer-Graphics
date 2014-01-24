@@ -2,15 +2,18 @@
 *.apk
 *.ap_
 
-# files for the dex VM
+# Files for the dex VM
 *.dex
 
 # Java class files
 *.class
 
-# generated files
+# Generated files
 bin/
 gen/
+
+# Ignoring Tilde files
+*~
 
 # Local configuration file (sdk path, etc)
 local.properties
