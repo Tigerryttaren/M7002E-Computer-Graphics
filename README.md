@@ -1,9 +1,27 @@
-M7002E-Computer-Graphics
-========================
-Student project for the course M7002E Computer Graphics With Virtual Environments at Luleå Tekniska Universitet
+M7002E Computer Graphics With Virtual Environments
+=================================================
+Student project at Luleå Tekniska Universitet.
 
 Lab 1
-=========================
+=======================
+Derpa derpa
+dpera
+
+Kittehs
+-----------------------
+HOhohohohohoh
+ihihih
+ihihi
+
+### Header 
+HOhohohohohoh
+ihihih
+ihihi
+## Header
+HOhohohohohoh
+ihihih
+ihihi
+# Header
 Features implemented:
 * Draws the outline of a square based pyramid.
 * Draws a filled in blue square.
@@ -13,6 +31,7 @@ Features implemented:
 in a way that the openGL state before one of your shapes is drawn, is preserved after the
 shape is drawn. See glPushAttrib(), glPushMatrix(), glPopAttrib(), glPopMatrix().
 
-
+Lab 2
+=======================
 
 
