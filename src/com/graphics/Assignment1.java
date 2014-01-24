@@ -86,7 +86,7 @@ public class Assignment1 implements GLEventListener {
 	 
 	     // Setting the viewport, the area that is displayed, to cover the whole window
 	     gl.glViewport(0, 0, width, height);
-	 
+	     
 	     // Setting the perspective projection with an aspect that matches that of the viewport
 	     // Choose Projection Matrix	
 	     gl.glMatrixMode(GL_PROJECTION);  
@@ -104,6 +104,9 @@ public class Assignment1 implements GLEventListener {
 	     // Enable the model-view transform
 	     gl.glMatrixMode(GL_MODELVIEW);
 	     gl.glLoadIdentity();
+	     
+	   
+	     
 	}
 	
 	// Support Methods
@@ -119,12 +122,13 @@ public class Assignment1 implements GLEventListener {
 		gl.glClear(GL_DEPTH_BUFFER_BIT);
 		
 		// Drawing the figures
-		drawPyramid(gl, drawable);
-		drawSquare(gl, drawable);
-		drawStar(gl, drawable);
+		// This easily allows for drawing additional figures of the same types as implemented, just copy the line and change the translation values
+		drawPyramid(gl, drawable, -3.0f, 0.0f, -8.0f);
+		drawSquare(gl, drawable, 0.0f, 0.0f, -10.0f);
+		drawStar(gl, drawable, 3.0f, 0.0f, -8.0f);
 	}
 	
-	private void drawPyramid(GL2 gl, GLAutoDrawable drawable) {
+	private void drawPyramid(GL2 gl, GLAutoDrawable drawable, Float x, Float y, Float z) {
 		// Pushing to matrix stack
 		gl.glPushMatrix();
 		
@@ -133,7 +137,7 @@ public class Assignment1 implements GLEventListener {
 	    gl.glLoadIdentity();      
 	    
 	    // Moves the figure in the (x, y, z)-axis
-	    gl.glTranslatef(-3.0f, 0.0f, -8.0f); 	
+	    gl.glTranslatef(x, y, z); 	
 	    
 	    // Makes only the outlines
 	    gl.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);			
@@ -174,7 +178,7 @@ public class Assignment1 implements GLEventListener {
 	    gl.glPopMatrix();
 	}
 	
-	private void drawSquare(GL2 gl, GLAutoDrawable drawable) {
+	private void drawSquare(GL2 gl, GLAutoDrawable drawable, Float x, Float y, Float z) {
 		// Pushing to matrix stack
 		gl.glPushMatrix();
 				
@@ -183,7 +187,7 @@ public class Assignment1 implements GLEventListener {
 	    gl.glLoadIdentity(); 
 	    
 	    // Moves the figure in the (x, y, z)-axis
-	    gl.glTranslatef(0.0f, 0.0f, -10.0f); 
+	    gl.glTranslatef(x, y, z); 
 	    
 	    // Makes so that square is filled in
 	    gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);		
@@ -210,7 +214,7 @@ public class Assignment1 implements GLEventListener {
 	    gl.glPopMatrix();
 	}
 	
-	private void drawStar(GL2 gl, GLAutoDrawable drawable) {
+	private void drawStar(GL2 gl, GLAutoDrawable drawable, Float x, Float y, Float z) {
 		// Pushing to matrix stack
 		gl.glPushMatrix();
 				
@@ -219,7 +223,7 @@ public class Assignment1 implements GLEventListener {
 		gl.glLoadIdentity();           
 		
 		// Moves the figure in the (x, y, z)-axis
-		gl.glTranslatef(3.0f, 0.0f, -8.0f); 
+		gl.glTranslatef(x, y, z); 
 					    
 		// BEGIN Star 
 		gl.glBegin (GL_LINE_LOOP); 
