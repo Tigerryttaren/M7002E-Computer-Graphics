@@ -11,10 +11,8 @@ import static javax.media.opengl.GL2GL3.GL_QUADS;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -24,22 +22,107 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JToolBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
-public class Assignment2 implements GLEventListener {
+public class Assignment2 extends JFrame implements GLEventListener {
+	public Assignment2() {
+		super("Assignment 2");
+		
+		JMenu create = new JMenu("Create");
+		//createMenu.setMnemonic('F');
+		
+		JMenu manipulate = new JMenu("Manipulate");
+		//createMenu.setMnemonic('F');
+		
+		JMenu application = new JMenu("Application");
+		//createMenu.setMnemonic('F');
+		
+		JMenuItem newPyramid = new JMenuItem("New Pyramid");
+		create.add(newPyramid);
+		
+		JMenuItem newSquare = new JMenuItem("New Square");
+		create.add(newSquare);	
+		
+		JMenuItem newStar = new JMenuItem("New Star");
+		create.add(newStar);
+		
+		JMenuItem manipulateTranslate = new JMenuItem("Translate");
+		manipulate.add(manipulateTranslate);
+		
+		JMenuItem manipulateRotate = new JMenuItem("Rotate");
+		manipulate.add(manipulateRotate);
+		
+		JMenuItem manipulateDelete = new JMenuItem("Delete");
+		manipulate.add(manipulateDelete);
+		
+		JMenuItem exit = new JMenuItem("Exit");
+		application.add(exit);
+		
+		// adding action listener to menu items
+		newPyramid.addActionListener(
+			new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+				{
+					System.out.println("New Pyramid");
+				}
+			}
+		);
+		
+		newSquare.addActionListener(
+			new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+				{
+					System.out.println("New Square");
+				}
+			}
+		);
+		
+		newStar.addActionListener(
+			new ActionListener(){
+				public void actionPerformed(ActionEvent e)
+				{
+					System.out.println("New Star");
+				}
+			}
+		);
+		
+		exit.addActionListener(
+				new ActionListener(){
+					public void actionPerformed(ActionEvent e)
+					{
+						System.out.println("Exit");
+					}
+				}
+		);
+		
+		JMenuBar bar = new JMenuBar();
+		setJMenuBar(bar);
+		
+		bar.add(application);
+		bar.add(create);
+		bar.add(manipulate);
+		
+		getContentPane();
+		setSize(800, 600);
+	}
+	
+	public void setVisibleLater() {
+		setVisible(true);
+	}
 	
 	// Constants and Globals
 	// GL Utility
 	private GLU glu;  
 	
 	public static void main(String[] args) {
+
+		Assignment2 app = new Assignment2();
+		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		// Initialization
 		// Setting up GL
 		GLProfile.initSingleton(); 
@@ -48,10 +131,14 @@ public class Assignment2 implements GLEventListener {
 		GLCanvas canvas = new GLCanvas(caps);
 		
 		// Making the AWT frame window
-		Frame frame = new Frame("Assignment 1");
-		frame.setSize(800, 600);
-		frame.add(canvas);
-		frame.setVisible(true);
+		//Frame frame = new Frame("Assignment 1");
+		//frame.setSize(800, 600);
+		//frame.add(canvas);
+		//frame.setVisible(true);
+		//frame.add(app);
+		
+		app.add(canvas);			
+		app.setVisibleLater();		
 		
 		// Adding a render listener
 		canvas.addGLEventListener(new Assignment2());
@@ -59,19 +146,18 @@ public class Assignment2 implements GLEventListener {
 		SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Menu menu = new Menu();
-                menu.setVisible(true);
+            	 //Menu menu = new Menu();
+                 //menu.setVisible(true);
             }
         });
 		
 		// Fixes so the exit button exits the program
-		frame.addWindowListener(new WindowAdapter() {
+		/*frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
-		});
+		});*/
 	}
-
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
