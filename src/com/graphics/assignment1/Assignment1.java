@@ -1,4 +1,4 @@
-package com.graphics;
+package com.graphics.assignment1;
 
 import static javax.media.opengl.GL2.GL_DEPTH_BUFFER_BIT;
 import static javax.media.opengl.GL2.GL_FRONT_AND_BACK;

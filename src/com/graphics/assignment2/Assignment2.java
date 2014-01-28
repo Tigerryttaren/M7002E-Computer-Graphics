@@ -1,16 +1,17 @@
-package com.graphics;
+package com.graphics.assignment2;
 
-import static javax.media.opengl.GL2.GL_DEPTH_BUFFER_BIT;
-import static javax.media.opengl.GL2.GL_FRONT_AND_BACK;
+import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
+import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
+import static javax.media.opengl.GL.GL_LINE_LOOP;
+import static javax.media.opengl.GL.GL_TRIANGLES;
 import static javax.media.opengl.GL2.GL_ALL_ATTRIB_BITS;
-import static javax.media.opengl.GL2.GL_TRIANGLES;
-import static javax.media.opengl.GL2.GL_QUADS;
-import static javax.media.opengl.GL2.GL_LINE_LOOP;
-import static javax.media.opengl.GL2GL3.GL_LINE;
 import static javax.media.opengl.GL2GL3.GL_FILL;
+import static javax.media.opengl.GL2GL3.GL_LINE;
+import static javax.media.opengl.GL2GL3.GL_QUADS;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
+import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -23,6 +24,14 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 
 public class Assignment2 implements GLEventListener {
 	
@@ -46,6 +55,14 @@ public class Assignment2 implements GLEventListener {
 		
 		// Adding a render listener
 		canvas.addGLEventListener(new Assignment2());
+		
+		SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Menu menu = new Menu();
+                menu.setVisible(true);
+            }
+        });
 		
 		// Fixes so the exit button exits the program
 		frame.addWindowListener(new WindowAdapter() {
