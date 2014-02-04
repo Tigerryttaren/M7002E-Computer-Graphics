@@ -25,6 +25,6 @@ Lab 2
 =======================
 Required features implemented:
 
-##### ADD FEATUER
+##### ADD FEATURES IMPLEMENTED
 
 
