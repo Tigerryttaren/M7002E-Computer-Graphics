@@ -7,9 +7,11 @@ public class Data {
 	private static Data reference;
 	private int nextID = 0;
 	private ArrayList<Shape> shapes = new ArrayList<Shape>();
+	public Light light;
+	private int currentSelectedID = -1;
 	
 	private Data() {
-	  // Pass
+		// Pass
 	}
 
 	public static Data getData() {
@@ -22,6 +24,18 @@ public class Data {
 	public Object clone() throws CloneNotSupportedException {
 		// Prevents cloning
 		throw new CloneNotSupportedException(); 
+	}
+	
+	public int getSelectedID(){
+		return this.currentSelectedID;
+	}
+	
+	public void setSelectedID(int id){
+		this.currentSelectedID = id;
+	}
+	
+	public void clearSelectedID(){
+		this.currentSelectedID = -1;
 	}
 	
 	public ArrayList<Shape> getShapes() {
@@ -47,5 +61,14 @@ public class Data {
 	
 	public void addShape(Shape shape) {
 		shapes.add(shape);
+	}
+	
+	public Shape getShapeByID(int id) throws Exception  {
+		for (Shape shape : this.shapes) {
+			if (shape.getID() == id) {
+				return shape;
+			}	
+		}
+		throw new Exception();	
 	}
 }

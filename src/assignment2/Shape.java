@@ -11,6 +11,11 @@ public abstract class Shape {
 	private float y;
 	private float z;
 	
+	private float angle;
+	private float rotate_x;
+	private float rotate_y;
+	private float rotate_z;
+	
 	private float red;
 	private float green;
 	private float blue;
@@ -37,7 +42,9 @@ public abstract class Shape {
 		this.z = z;
 	}
 	
-	public abstract void draw (GL2 gl, GLU glu);
+	public abstract void draw(GL2 gl, GLU glu);
+	public abstract void resize(float scalar);
+	public abstract String print();
 	
 	public float getX(){
 		return this.x;
@@ -77,6 +84,22 @@ public abstract class Shape {
 	
 	public float getBlue() {
 		return this.blue;
+	}
+	
+	public float getRotateX() {
+		return this.rotate_x;
+	}
+	
+	public float getRotateY() {
+		return this.rotate_y;
+	}
+	
+	public float getRotateZ() {
+		return this.rotate_z;
+	}
+	
+	public float getAngle() {
+		return this.angle;
 	}
 	
 	public float getAmbientRed() {
@@ -125,6 +148,26 @@ public abstract class Shape {
 	
 	public float getDiffuseAlpha() {
 		return this.diffuse_alpha;
+	}
+	
+	public void move(float x, float y, float z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+	
+	public void rotate(float angle, float x, float y, float z) {
+		this.angle = angle;
+		this.rotate_x = x;
+		this.rotate_y = y;
+		this.rotate_z = z;
+	}
+	
+	public void setRotation(float angle, float x, float y, float z) {
+		this.angle = angle;
+		this.rotate_x = x;
+		this.rotate_y = y;
+		this.rotate_z = z;
 	}
 	
 	public void setColor(float red, float green, float blue) {
