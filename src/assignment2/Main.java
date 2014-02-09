@@ -25,6 +25,11 @@ import javax.swing.UIManager;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.Animator;
 
+/*
+ * Anton Wennberg, 2014-02-9
+ * M7002E
+ */
+
 @SuppressWarnings("serial")
 public class Main extends JFrame {
 
@@ -158,31 +163,21 @@ public class Main extends JFrame {
 		public void processHits(int hits, IntBuffer buffer) {
 		    int offset = 0;
 		    int names;
-		    float z1, z2;
+		    
 		    ArrayList<Integer> shapes_id_hit = new ArrayList<Integer>();
 		    ArrayList<float[]> shapes_hit = new ArrayList<float[]>();
 		    
 		    for (int i = 0; i < hits; i++) {
 		        names = buffer.get(offset); 
-		        offset++;
-		        
-		        //TODO: Add bt three instead and remove the z1, z2
-		        z1 = (float) (buffer.get(offset)& 0xffffffffL) / 0x7fffffff; 
-		        offset++;
-		        z2 = (float) (buffer.get(offset)& 0xffffffffL) / 0x7fffffff; 
-		        offset++;
+		        offset = offset + 3;
 
 		        for (int j = 0; j < names; j++) { 
 		            if (j == (names - 1)) {
 		            	shapes_id_hit.add(buffer.get(offset));
 		            }
-		            //TODO: remove this snippet
-		            /*else {
-		              //System.out.println();
-		            }*/
 		            offset++;
-		          }
-		      }
+		        }
+		    }
 		    
 		    // Creates a list of shapes hit
 		    Data handle = Data.getData();
@@ -195,16 +190,19 @@ public class Main extends JFrame {
             	}
             }
             
-            //TODO: clean up this code a bit... looks awful
             Collections.sort(shapes_hit, new Comparator<float[]>() {
                 @Override
-                public int compare(float[] a, float[] b) {
-                        return (int) (1000000*a[1]-1000000*b[1]);
+                public int compare(float[] x, float[] y) {
+                		//TOD: This could be solved in a much prettier way, fix if there is time
+                        return (int) (1000000*x[1]-1000000*y[1]);
                 }
         	});
               	
             if (!shapes_hit.isEmpty()) {	
             	Data.getData().setSelectedID((int) Math.round(shapes_hit.get(shapes_hit.size()-1)[0]));  
+            } else {
+            	// Handles de-selection of shapes
+            	Data.getData().setSelectedID(-1); 
             }
 		}
 		

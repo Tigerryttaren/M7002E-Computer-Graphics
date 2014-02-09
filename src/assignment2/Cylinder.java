@@ -49,8 +49,7 @@ public class Cylinder extends Shape {
 	    // Moves the figure in the (x, y, z)-axis
 	    gl.glTranslatef(getX(), getY(), getZ());
 	    
-	    //TODO: Should menu option?
-	    // gl.glRotatef(45.0f, -0.2f, 1.0f, 0.0f);
+	    // Rotation
 	    gl.glRotatef(getAngle(), getRotateX(), getRotateY(), getRotateZ()); 
 
 	    // Pushing to attribute stack

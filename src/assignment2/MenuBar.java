@@ -251,9 +251,15 @@ public class MenuBar extends JFrame {
 				new ActionListener(){
 					public void actionPerformed(ActionEvent e){
 						ArrayList<Float> input = DialogMove(MenuBar.this);
+						
 						float x = input.get(0);
 						float y = input.get(1);
 						float z = input.get(2);
+						
+						// To handle manipulation with no selected object
+						if (Data.getData().getSelectedID() == -1) {
+							return;
+						}
 						
 						Data handle = Data.getData();
 						int selectedID = handle.getSelectedID();
@@ -275,6 +281,11 @@ public class MenuBar extends JFrame {
 						float y = input.get(2);
 						float z = input.get(3);
 						
+						// To handle manipulation with no selected object
+						if (Data.getData().getSelectedID() == -1) {
+							return;
+						}
+						
 						Data handle = Data.getData();
 						int selectedID = handle.getSelectedID();
 						try {
@@ -292,6 +303,11 @@ public class MenuBar extends JFrame {
 						ArrayList<Float> input = DialogResize(MenuBar.this);
 						float scalar = input.get(0);
 						
+						// To handle manipulation with no selected object
+						if (Data.getData().getSelectedID() == -1) {
+							return;
+						}
+						
 						Data handle = Data.getData();
 						int selectedID = handle.getSelectedID();
 						try {
@@ -308,6 +324,11 @@ public class MenuBar extends JFrame {
 					public void actionPerformed(ActionEvent e){
 						Data handle = Data.getData();
 						int selectedID = handle.getSelectedID();
+						
+						// To handle manipulation with no selected object
+						if (Data.getData().getSelectedID() == -1) {
+							return;
+						}
 						
 						for (Shape shape : handle.getShapes()) {
 							if (shape.getID() == selectedID) {
@@ -823,7 +844,7 @@ public class MenuBar extends JFrame {
         p.add(labels, BorderLayout.WEST);
 
         JPanel panel = new JPanel(new GridLayout(0, 1, 2, 2));      
-        // Getting The Current Values
+        // Getting the current values
         float curr_x = 0.0f;
     	float curr_y = 0.0f;
     	float curr_z = 0.0f;
@@ -874,7 +895,7 @@ public class MenuBar extends JFrame {
         p.add(labels, BorderLayout.WEST);
 
         JPanel panel = new JPanel(new GridLayout(0, 1, 2, 2));      
-        // Getting The Current Values
+        // Getting the current values
         float curr_angle = 0.0f;
         float curr_x = 0.0f;
     	float curr_y = 0.0f;

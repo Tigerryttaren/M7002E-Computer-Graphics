@@ -16,22 +16,6 @@ public class Light extends Shape {
 		return this.w;
 	}
 	
-	public String print() {
-		// Pass, quite actually
-		String res = "";
-		/*
-		//TODO: Remove
-		String specs = "Specs(ID: " + getID() + ")";
-		String position = "Position(X: " + getX() + ", Y: " + getY() + ", Z: " + getZ() + ", W: " + getW() + ")";
-		String material_ambient = "Material-Ambient(R: " + getAmbientRed() + ", G: " + getAmbientGreen() + ", B: " + getAmbientBlue() + ", A: " + getAmbientAlpha() + ")";
-		String material_specular = "Material-Specular(R: " + getSpecularRed() + ", G: " + getSpecularGreen() + ", B: " + getSpecularBlue() + ", A: " + getSpecularAlpha() + ")";
-		String material_diffuse = "Material-Diffuse(R: " + getDiffuseRed() + ", G: " + getDiffuseGreen() + ", B: " + getDiffuseBlue() + ", A: " + getDiffuseAlpha() + ")";
-		
-		res = "Light Source[ " + specs + ", " + position + ", " + material_ambient + ", " + material_specular + ", " + material_diffuse + "]";
-		*/
-		return res;
-	}
-	
 	@Override
 	public void draw(GL2 gl, GLU glu) {	
 		// The light components
@@ -70,5 +54,10 @@ public class Light extends Shape {
 	@Override
 	public void resize(float scalar) {
 		// Pass
+	}
+	
+	public String print() {
+		// Pass, quite actually
+		return "";
 	}
 }
