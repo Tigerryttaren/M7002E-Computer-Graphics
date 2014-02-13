@@ -15,6 +15,15 @@ gen/
 # My archive package
 archive/
 
+# Some .zip files
+town.zip
+town/
+
+# Some libs?
+libopenal64.so
+liblwjgl64.so
+
+
 # Ignoring Tilde files
 *~
 

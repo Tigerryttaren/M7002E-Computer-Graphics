@@ -2,26 +2,23 @@ M7002E Computer Graphics With Virtual Environments
 =================================================
 Student project at Luleå Tekniska Universitet.
 
-Lab 1
+Assignment 3
 =======================
-Required features implemented:
+### Required features implemented
 
-##### Outlines of a Square-based Pyramid
-The outlines of a red square based pyramid has been drawn. 
+#### Creating an Enclosed Enviromnent
+An enclosed room with a floor, a roof and 4 walls was created. All of the are solid and will not let the player ass through them.
 
-##### Blue Filled-in Square
-A blue filled in square has been drawn.
+#### Model Creation
 
-##### Any Kind of Green Star
-A green star has been drawn. A four-pointed star was chosen because it is very easy do draw compared to a five-pointed star, for example. 
 
-##### Easy Creation of Additional Figures
-The code was designed so that the drawing of the figures are done in functions, which can easily be called on to make additional figures. 
+#### instancing
 
-##### Preserves the OpenGL State
-The functions *glPushAttrib()*, *glPushMatrix()*, *glPopAttrib()*, and *glPopMatrix()* was used  for preserving the openGL state before translating or rotating the figures, and also before changing attributes such as colors.
+#### Smooth Motion
 
-Lab 2
+### Instructions
+
+Assignment 2
 =======================
 ### "Disclaimer"
 The robustness of this program may in many cases be a little less robust than one generally wants. Please, be careful when entering values into the program, and follow the structure of the standard values placed in the input boxes as examples. Faulty input structure will likely result in a program crash. 
@@ -64,3 +61,22 @@ Choose new coordinates.
 
 ##### Delete a shape
 Click on a shape, then click the menu option for delete.
+
+Assignment 1
+=======================
+Required features implemented:
+
+##### Outlines of a Square-based Pyramid
+The outlines of a red square based pyramid has been drawn. 
+
+##### Blue Filled-in Square
+A blue filled in square has been drawn.
+
+##### Any Kind of Green Star
+A green star has been drawn. A four-pointed star was chosen because it is very easy do draw compared to a five-pointed star, for example. 
+
+##### Easy Creation of Additional Figures
+The code was designed so that the drawing of the figures are done in functions, which can easily be called on to make additional figures. 
+
+##### Preserves the OpenGL State
+The functions *glPushAttrib()*, *glPushMatrix()*, *glPopAttrib()*, and *glPopMatrix()* was used  for preserving the openGL state before translating or rotating the figures, and also before changing attributes such as colors.
