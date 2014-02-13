@@ -158,28 +158,30 @@ public class Main extends SimpleApplication implements ActionListener {
 	// Materials used in the scene
 	public void initMaterials() { 
 		ground_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		TextureKey ground_key = new TextureKey("Textures/Terrain/splat/dirt.jpg");
+		TextureKey ground_key = new TextureKey("black_tile.png");
 		ground_key.setGenerateMips(true);
 		Texture ground_texture = assetManager.loadTexture(ground_key);
 		ground_texture.setWrap(WrapMode.Repeat);
 		ground_material.setTexture("ColorMap", ground_texture);
 		
 		sky_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		TextureKey sky_key = new TextureKey("Textures/Terrain/splat/dirt.jpg");
+		TextureKey sky_key = new TextureKey("black_tile.png");
 		sky_key.setGenerateMips(true);
 		Texture sky_texture = assetManager.loadTexture(sky_key);
 		sky_texture.setWrap(WrapMode.Repeat);
 		sky_material.setTexture("ColorMap", sky_texture);
 		
 		crate_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-	    TextureKey crate_key = new TextureKey("Textures/Terrain/splat/grass.jpg");
+	    TextureKey crate_key = new TextureKey("companion.jpg");
+	    //crate_key.setAsCube(true);
 	    crate_key.setGenerateMips(true);
 	    Texture crate_texture = assetManager.loadTexture(crate_key);
-	    crate_texture.setWrap(WrapMode.Repeat);
+	    //crate_texture.setWrap(WrapMode.Repeat);
 	    crate_material.setTexture("ColorMap", crate_texture);
 		
 		wall_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-	    TextureKey wall_key = new TextureKey("Textures/Terrain/BrickWall/BrickWall.jpg");
+	    //TextureKey wall_key = new TextureKey("Textures/Terrain/BrickWall/BrickWall.jpg");
+		TextureKey wall_key = new TextureKey("black_tile.png");
 	    wall_key.setGenerateMips(true);
 	    Texture wall_texture = assetManager.loadTexture(wall_key);
 	    wall_texture.setWrap(WrapMode.Repeat);
@@ -189,9 +191,9 @@ public class Main extends SimpleApplication implements ActionListener {
 	// Make a player
 	public void initPlayer() {
 		player = new CharacterControl(new CapsuleCollisionShape(1.5f, 6f, 1), 0.05f);
-		player.setJumpSpeed(50); 	// Default 20
-		player.setFallSpeed(50); 	// Default 30
-		player.setGravity(30); 		// Default 30
+		player.setJumpSpeed(20); 	// Default 20
+		player.setFallSpeed(30); 	// Default 30
+		player.setGravity(50); 		// Default 30
 		player.setPhysicsLocation(new Vector3f(0, 10, 0));
 		
     	bulletAppState.getPhysicsSpace().add(player);
@@ -252,15 +254,13 @@ public class Main extends SimpleApplication implements ActionListener {
 	}
 	
 	public void initCrates() {
-		makeCrate(10, 5, 10, 2, 0, 0, 0, 2);
-		
-		
+		makeCrate(10, 6, 10, 2, 0, 0, 0, 1.5f);		
 	}
 	
 	private void makeCrate(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale) {
 		Geometry crate_geometry = new Geometry("Crate", crate);
 		crate_geometry.setMaterial(crate_material);
-		
+		this.rootNode.attachChild(crate_geometry);
 		// Translating the wall to its location
 		crate_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
 		crate_geometry.setLocalScale(scale);
@@ -270,10 +270,10 @@ public class Main extends SimpleApplication implements ActionListener {
 		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
 		crate_geometry.setLocalRotation(rotate90);
 		
-		this.rootNode.attachChild(crate_geometry);
+		crate_geometry.getMesh().scaleTextureCoordinates(new Vector2f(0.335f, 0.166f));
 		
 		// Creates the physical with a mass 0.0f
-		crate_physical = new RigidBodyControl(0.0f);
+		crate_physical = new RigidBodyControl(1f);
 		crate_geometry.addControl(crate_physical);
 		bulletAppState.getPhysicsSpace().add(crate_physical);
 	}

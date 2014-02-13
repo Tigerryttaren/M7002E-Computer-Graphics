@@ -15,6 +15,9 @@ gen/
 # My archive package
 archive/
 
+# Assets folder
+assets/
+
 # Some .zip files
 town.zip
 town/
