@@ -4,6 +4,9 @@ Student project at Luleå Tekniska Universitet.
 
 Assignment 3
 =======================
+### "Disclaimer"
+The textures were blatantly borrowed from the internet for educational purposes only. Credit to their respective creators. 
+
 ### Required features implemented
 
 #### Creating an Enclosed Enviromnent
