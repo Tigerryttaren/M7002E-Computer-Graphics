@@ -4,19 +4,21 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.TextureKey;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
+import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.CharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
@@ -55,7 +57,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	private RigidBodyControl ground_physical;
 	private RigidBodyControl ceiling_physical;
 	private RigidBodyControl wall_physical;
-	private RigidBodyControl crate_physical;
+	//private RigidBodyControl crate_physical;
 	private RigidBodyControl hal9000_physical;
 	private RigidBodyControl door_physical;
 	
@@ -83,7 +85,7 @@ public class Main extends SimpleApplication implements ActionListener {
     	hal9000 = new Box (0.5f, 6f, 2f);
     	hal9000.scaleTextureCoordinates(new Vector2f(3, 6));
     	
-    	door = new Box (0.5f, 4.5f, 2f);
+    	door = new Box (0.5f, 5.3f, 4.5f);
     	door.scaleTextureCoordinates(new Vector2f(3, 6));
 	}
  
@@ -92,15 +94,15 @@ public class Main extends SimpleApplication implements ActionListener {
 		bulletAppState = new BulletAppState();
 		stateManager.attach(bulletAppState);
 		
-		// CHanging the color of the "skies"
-		//viewPort.setBackgroundColor(new ColorRGBA(0.3f, 0.5f, 1f, 1f));
-		
 		// Change near to stop clipping some objects on contact
 		cam.setFrustumPerspective(45f, (float)cam.getWidth()/cam.getHeight(), 0.01f, 1000f);
 		
 		// Make camera to look at scene 
 		cam.setLocation(new Vector3f(0, 4f, 6f));
-		cam.lookAt(new Vector3f(2, 2, 0), Vector3f.UNIT_Y);
+		cam.lookAt(new Vector3f(2, 2, 0), Vector3f.UNIT_Y);		
+		
+		// Setting gravity
+		bulletAppState.getPhysicsSpace().setGravity(new Vector3f(0, -9.82f*10f, 0));
 		
 		initKeys();
 		initMaterials();
@@ -114,6 +116,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		initCrossHair();
 	}
 	
+	// Initialized the key mapping to controls work
 	private void initKeys() {
 		inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
 		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
@@ -130,9 +133,11 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 	@Override
     public void simpleUpdate(float tpf) {
+		// Experiment with trying to get the "jitter" to stop
 		rootNode.updateGeometricState();
 		rootNode.updateLogicalState(tpf);
 		
+		// Setting the camera
 		camera_direction.set(cam.getDirection()).multLocal(0.6f);
 		camera_left.set(cam.getLeft()).multLocal(0.4f);
 		walking_direction.set(0, 0, 0);
@@ -153,6 +158,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		cam.setLocation(player.getPhysicsLocation());
     }
 	
+	// Actions performed when button is pressed
 	public void onAction(String key_binding, boolean is_pressed, float tpf) {
 		if (key_binding.equals("Forward")) {
 	    	forward = is_pressed;
@@ -191,13 +197,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		Texture ground_texture = assetManager.loadTexture(ground_key);
 		ground_texture.setWrap(WrapMode.Repeat);
 		ground_material.setTexture("ColorMap", ground_texture);
-		
-		crate_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-	    TextureKey crate_key = new TextureKey("companion_cube.jpg");
-	    crate_key.setGenerateMips(true);
-	    Texture crate_texture = assetManager.loadTexture(crate_key);
-	    crate_material.setTexture("ColorMap", crate_texture);
-	    
+	
 	    hal9000_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 	    TextureKey hal9000_key = new TextureKey("HAL9000.jpg");
 	    hal9000_key.setGenerateMips(true);
@@ -205,7 +205,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	    hal9000_material.setTexture("ColorMap", hal9000_texture);
 	    
 	    door_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-	    TextureKey door_key = new TextureKey("door.png");
+	    TextureKey door_key = new TextureKey("steel_door.jpg");
 	    door_key.setGenerateMips(true);
 	    Texture door_texture = assetManager.loadTexture(door_key);
 	    door_material.setTexture("ColorMap", door_texture);
@@ -214,9 +214,9 @@ public class Main extends SimpleApplication implements ActionListener {
 	// Make the player
 	public void initPlayer() {
 		player = new CharacterControl(new CapsuleCollisionShape(1.5f, 6f, 1), 0.05f);
-		player.setJumpSpeed(20); 	// Default 20
-		player.setFallSpeed(30); 	// Default 30
-		player.setGravity(50); 		// Default 30
+		player.setJumpSpeed(20); 	
+		player.setFallSpeed(30); 	
+		player.setGravity(80); 		
 		player.setPhysicsLocation(new Vector3f(0, 10, 0));
 		
     	bulletAppState.getPhysicsSpace().add(player);
@@ -248,6 +248,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		bulletAppState.getPhysicsSpace().add(ceiling_physical);
 	}
 	
+	// Making all walls
 	public void initWalls() {
 		// Making the four walls
 		makeWall(0, 30, 100, 2, 0, 1, 0);
@@ -256,6 +257,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		makeWall(-100, 30, 0, 2, 0, 0, 0);
 	}
 	
+	// Making a single wall
 	private void makeWall(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z) {
 		Geometry wall_geometry = new Geometry("Wall", wall);
 		wall_geometry.setMaterial(wall_material);
@@ -276,37 +278,85 @@ public class Main extends SimpleApplication implements ActionListener {
 		bulletAppState.getPhysicsSpace().add(wall_physical);
 	}
 	
+	// Making all crates
 	public void initCrates() {
-		makeCrate(10, 6, 10, 2, 0, 0, 0, 1.5f);	
-		//makeCrate(30, 6, 30, 2, 0, 0, 0, 1.5f);	
+		// Smalll crates
+		makeCrate(0, 30, 0, 2, 0, 0, 0, 1.5f, 9f);	
+		
+		// Making the four corner crates
+		makeCrate(50, 30, 50, 2, 0, 0, 0, 10, 1000f);
+		makeCrate(-50, 30, 50, 2, 0, 0, 0, 10, 1000f);
+		makeCrate(50, 30, -50, 2, 0, 0, 0, 10, 1000f);	
+		makeCrate(-50, 30, -50, 2, 0, 0, 0, 10, 1000f);
 	}
 	
-	private void makeCrate(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale) {
-		Geometry crate_geometry = new Geometry("Crate", crate);
-		crate_geometry.setMaterial(crate_material);
-		this.rootNode.attachChild(crate_geometry);
-		// Translating the wall to its location
-		crate_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
-		crate_geometry.setLocalScale(scale);
-		
-		// Using a quaternion to save a rotation to be used on the wall
-		Quaternion rotate90 = new Quaternion(); 
-		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
-		crate_geometry.setLocalRotation(rotate90);
-		
-		crate_geometry.getMesh().scaleTextureCoordinates(new Vector2f(0.335f, 0.166f));
-		
-		// Creates the physical with a mass 0.0f
-		crate_physical = new RigidBodyControl(0.5f);
-		crate_geometry.addControl(crate_physical);
-		bulletAppState.getPhysicsSpace().add(crate_physical);
+	/* THE GOOD ONE
+	private void makeCrate(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale, float mass) {
+		Box cube = new Box(1f,1f,1f);
+	    Geometry cube_geometry = new Geometry("My Textured Box", cube);
+	    cube_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
+	    Material cube_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+	    Texture cube_texture = assetManager.loadTexture("crate.jpg");
+	    cube_material.setTexture("ColorMap", cube_texture);
+	    
+	    // Using a quaternion to save a rotation to be used on the wall
+	 	Quaternion rotate90 = new Quaternion(); 
+	 	rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
+	 	cube_geometry.setLocalRotation(rotate90);
+	 	
+	    cube_geometry.setLocalScale(scale);
+	    cube_geometry.setMaterial(cube_material);
+	    this.rootNode.attachChild(cube_geometry);
+	   
+	    CollisionShape cube_shape = CollisionShapeFactory.createBoxShape(cube_geometry);
+	    RigidBodyControl cube_physical = new RigidBodyControl(cube_shape, mass);
+	    //cube_physical.setMass(2f);
+	    //cube_physical.getPhysicsSpace().setGravity((new Vector3f(0f,-9.81f,0f)));
+	    cube_physical.setGravity(new Vector3f(0f,-9.81f,0f));
+	    //cube_physical.setRestitution(80f);
+	    cube_physical.setFriction(5f);
+		cube_geometry.addControl(cube_physical);
+		bulletAppState.getPhysicsSpace().add(cube_physical);
+	}*/
+	
+	// Making a single crate
+	private void makeCrate(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale, float mass) {
+		Box cube = new Box(1f,1f,1f);
+	    Geometry cube_geometry = new Geometry("My Textured Box", cube);
+	    cube_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
+	    Material cube_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+	    Texture cube_texture = assetManager.loadTexture("crate.jpg");
+	    cube_material.setTexture("ColorMap", cube_texture);
+	    
+	    // Using a quaternion to save a rotation to be used on the wall
+	 	Quaternion rotate90 = new Quaternion(); 
+	 	rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
+	 	cube_geometry.setLocalRotation(rotate90);
+	 	
+	    cube_geometry.setLocalScale(scale);
+	    cube_geometry.setMaterial(cube_material);
+	    this.rootNode.attachChild(cube_geometry);
+	   
+	    CollisionShape cube_shape = CollisionShapeFactory.createBoxShape(cube_geometry);
+	    RigidBodyControl cube_physical = new RigidBodyControl(cube_shape, mass);
+	    
+	    //cube_physical.setMass(mass);
+	    //cube_physical.getPhysicsSpace().setGravity((new Vector3f(0f,-9.81f,0f)));
+	    //cube_physical.setGravity(new Vector3f(0f,9.81f*10f,0f));
+	    //cube_physical.applyCentralForce( new Vector3f(0, 9.8f*10f, 0) );
+	    //cube_physical.setRestitution(80f);
+	    
+	    cube_physical.setFriction(5f);
+		cube_geometry.addControl(cube_physical);
+		bulletAppState.getPhysicsSpace().add(cube_physical);
 	}
 	
+	// Making all HAL9000s
 	public void initHal9000(){
 		makeHal9000(-101.6f, 30, 0, 2, 0, 0, 0, 4);
-		//makeHal9000(4, 5, 10.4f, 2, 0, 1, 0, 4);
 	}
 	
+	// Make a single HAL9000
 	private void makeHal9000(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale) {
 		Geometry hal9000_geometry = new Geometry("HAL9000", hal9000);
 		hal9000_geometry.setMaterial(hal9000_material);
@@ -321,6 +371,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
 		hal9000_geometry.setLocalRotation(rotate90);
 		
+		// Scales the textures
 		hal9000_geometry.getMesh().scaleTextureCoordinates(new Vector2f(0.335f, 0.166f));
 		
 		// Creates the physical with mass as argument
@@ -329,10 +380,12 @@ public class Main extends SimpleApplication implements ActionListener {
 		bulletAppState.getPhysicsSpace().add(hal9000_physical);
 	}
 	
+	// Making all doors
 	public void initDoor(){
-		makeDoor(4, 5, 100.4f, 2, 0, 1, 0, 1.2f);
+		makeDoor(8, 6, 100.4f, 2, 0, 1, 0, 1.2f);
 	}
 	
+	// Making a single door
 	private void makeDoor(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale) {
 		Geometry door_geometry = new Geometry("Door", door);
 		door_geometry.setMaterial(door_material);
@@ -355,11 +408,12 @@ public class Main extends SimpleApplication implements ActionListener {
 		bulletAppState.getPhysicsSpace().add(door_physical);
 	}
  
-	// Crosshair design from HelloPhysics.java
+	// Crosshairs
 	protected void initCrossHair() {
 		guiNode.detachAllChildren();
 		guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
 		BitmapText crosshairs = new BitmapText(guiFont, false);
+		
 		crosshairs.setSize(guiFont.getCharSet().getRenderedSize()*2);
 		crosshairs.setText("+");        
 		crosshairs.setLocalTranslation(settings.getWidth()/2 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/2 + crosshairs.getLineHeight()/2, 0);

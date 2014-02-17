@@ -5,7 +5,7 @@ Student project at Luleå Tekniska Universitet.
 Assignment 3
 =======================
 ### "Disclaimer"
-The textures were blatantly borrowed from the internet for educational purposes only. Credit to their respective creators. 
+The controls and the generall plauer concept was inspired from the HelloCollisions.java example, and Crosshairs were inspired from HelloPhysics.java.
 
 ### Required features implemented
 
@@ -15,11 +15,23 @@ An enclosed room with a floor, a roof and 4 walls was created. All of the are so
 #### Model Creation
 
 
-#### instancing
+#### Instancing
 
 #### Smooth Motion
 
 ### Instructions
+
+
+### References
+##### Black Tile Texture 
+http://www.moddb.com/mods/h2f/images/the-even-newer-panel-texture1
+##### Crate Texture
+http://grabcad.com/library/wood-crate-1
+##### HAL9000
+http://adventuretime.wikia.com/wiki/File:HAL9000.jpg
+##### Steel Door
+http://wiskha.com/steel-doors-for-home/fireproof-steel-doors-from-yongkang-mingdoor-manufacturing
+
 
 Assignment 2
 =======================
