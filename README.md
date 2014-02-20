@@ -5,22 +5,27 @@ Student project at Luleå Tekniska Universitet.
 Assignment 3
 =======================
 ### "Disclaimer"
-The controls and the generall plauer concept was inspired from the HelloCollisions.java example, and Crosshairs were inspired from HelloPhysics.java.
+The controls and the general player concept was inspired from the HelloCollisions.java example, and crosshairs were taken pretty straight off from HelloPhysics.java.
+
+### World Breach
+In some cases, a box that has gained significant speed or torque might penetrate the ceiling or ground due to awesome forces.
 
 ### Required features implemented
 
 #### Creating an Enclosed Enviromnent
-An enclosed room with a floor, a roof and 4 walls was created. All of the are solid and will not let the player ass through them.
+An enclosed room with a floor, a roof and four walls was created. All of the are solid and will not let the player pass through them.
 
 #### Model Creation
-
+I chose to create the models programatically and add some fancy textures. 
 
 #### Instancing
+The crates, drones and most objects are created by calling a method that takes the properties as input. One can easily instanciate several objects.
 
 #### Smooth Motion
+In front of HAL9000, there are three crates that can be manipulated to fidget around. Also, in the ceiling there are three surveilance drones that will move following a path when the player presses buttons.
 
 ### Instructions
-
+Move the player with the WASD and SPACE keys, as well as the mouse or ARROW keys to move the camera. Use the 1 key to manipulate Crate 1, the 2 key to manipulate Crate 2, and the 3 key to manipulate Crate 3. Bounce the red rubber ball on the B key. Start surveilance drone 1 with key 7, drone 2 with key 8 and drone 3 with key 9.
 
 ### References
 ##### Black Tile Texture 
@@ -31,7 +36,10 @@ http://grabcad.com/library/wood-crate-1
 http://adventuretime.wikia.com/wiki/File:HAL9000.jpg
 ##### Steel Door
 http://wiskha.com/steel-doors-for-home/fireproof-steel-doors-from-yongkang-mingdoor-manufacturing
-
+##### Ball 
+http://www.psdgraphics.com/backgrounds/orange-basketball-texture/
+##### Drone
+http://community.fantasyflightgames.com/index.php?/topic/73877-death-star-scenario-rules/
 
 Assignment 2
 =======================
