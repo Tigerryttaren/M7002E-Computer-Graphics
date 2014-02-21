@@ -8,10 +8,10 @@ Assignment 3
 ### "Disclaimer"
 The controls and the general player concept was inspired from the HelloCollisions.java example, and crosshairs were taken pretty straight off from HelloPhysics.java.
 
-### "Features" or Bugs 
+### "Features" 
 
 #### Occational World Breach
-In some cases, a box that has gained significant speed or torque might penetrate the ceiling or ground due to awesome forces.
+In some cases, a box that has gained significant speed or torque might penetrate the ceiling or ground due to *awesome* forces.
 
 ### Required Features Implemented
 ##### Creating an Enclosed Enviromnent
@@ -32,15 +32,17 @@ In front of HAL9000, there are three crates that can be manipulated to fidget ar
 Use the **WASD** and **SPACE** keys to move around the environment, as well as **MOUSE** or **ARROW** keys to move the camera.
 
 ##### Small Crates
-Use the **1** key to manipulate one of the crates, and use **2** and **3** to manipulate the ovther two. Only the small crates can be manipulated. 
+Use the **1** key to manipulate one of the crates, and use the **2** and **3** keys to manipulate the ovther two. Only the small crates can be manipulated. 
 
 ##### Red Rubber Ball
-use the **B** key to make the ball bounce.
+Use the **B** key to make the red rubber ball bounce.
 
 ##### Surveilance Drones
-Use the **7** key to make one of the drones move, and the **8** and **9** to move the other two.
+Use the **7** key to make one of the drones move, and the **8** and **9** keys to move the other two drones.
 
 ### Texture References
+The textures for this project was borrowed from these sites and projects. All credit to their creators.
+
 ##### Black Tile Texture
 http://www.moddb.com/mods/h2f/images/the-even-newer-panel-texture1
 ##### Crate Texture
