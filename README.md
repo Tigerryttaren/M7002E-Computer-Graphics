@@ -2,15 +2,18 @@ M7002E Computer Graphics With Virtual Environments
 =================================================
 Student project at Luleå Tekniska Universitet.
 
+=======================
 Assignment 3
 =======================
 ### "Disclaimer"
 The controls and the general player concept was inspired from the HelloCollisions.java example, and crosshairs were taken pretty straight off from HelloPhysics.java.
 
-### Occational World Breach
+### "Features" or Bugs 
+
+#### Occational World Breach
 In some cases, a box that has gained significant speed or torque might penetrate the ceiling or ground due to awesome forces.
 
-### Required features implemented
+### Required Features Implemented
 ##### Creating an Enclosed Enviromnent
 An enclosed room with a floor, a roof and four walls was created. All of the are solid and will not let the player pass through them.
 
@@ -24,7 +27,18 @@ The crates, drones and most objects are created by calling a method that takes t
 In front of HAL9000, there are three crates that can be manipulated to fidget around. Also, in the ceiling there are three surveilance drones that will move following a path when the user presses buttons.
 
 ### Instructions
-Move the player with the WASD and SPACE keys, as well as the mouse or ARROW keys to move the camera. Use the 1 key to manipulate Crate 1, the 2 key to manipulate Crate 2, and the 3 key to manipulate Crate 3. Bounce the red rubber ball on the B key. Start surveilance drone 1 with key 7, drone 2 with key 8 and drone 3 with key 9.
+
+##### Heroic Player 
+Use the **WASD** and **SPACE** keys to move around the environment, as well as **MOUSE** or **ARROW** keys to move the camera.
+
+##### Small Crates
+Use the **1** key to manipulate one of the crates, and use **2** and **3** to manipulate the ovther two. Only the small crates can be manipulated. 
+
+##### Red Rubber Ball
+use the **B** key to make the ball bounce.
+
+##### Surveilance Drones
+Use the **7** key to make one of the drones move, and the **8** and **9** to move the other two.
 
 ### Texture References
 ##### Black Tile Texture
