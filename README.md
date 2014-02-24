@@ -3,13 +3,55 @@ M7002E Computer Graphics With Virtual Environments
 Student project at Luleå Tekniska Universitet.
 
 =======================
+Assignment 4
+=======================
+### "Disclaimer"
+The controls and the general player concept was inspired from the HelloCollisions.java example, and crosshairs were taken pretty straight off from HelloPhysics.java. The HelloPicking.java example was used for learning how to do picking.
+
+### "Features" aka Bugs
+
+### Required Features Implemented
+##### Supports Egocentric Locomotion
+Yes. 
+
+##### Picking
+Direct selection is implemented. The player has the ability to aim at an object and select it.
+
+##### At Least Two Point of Views
+
+##### Look Somewhat Natural
+Utilizing pretty textures from the internet and rudimentary physics, the scene looks and feels at least somewhat natural.
+
+MISSING LIGHT SOURCE
+
+
+
+### Instructions
+
+### Texture References
+The textures for this project was borrowed from these sites and projects. All credit to their creators.
+
+##### Black Tile Texture
+http://www.moddb.com/mods/h2f/images/the-even-newer-panel-texture1
+##### Crate Texture
+http://grabcad.com/library/wood-crate-1
+##### HAL9000 Texture
+http://adventuretime.wikia.com/wiki/File:HAL9000.jpg
+##### Steel Door Texture
+http://wiskha.com/steel-doors-for-home/fireproof-steel-doors-from-yongkang-mingdoor-manufacturing
+##### Biohazard Symbol
+http://en.wikipedia.org/wiki/File:Biohazard_symbol.svg
+##### Radioactivity Symbol
+http://commons.wikimedia.org/wiki/File:Radiation_warning_symbol2.svg
+
+
+=======================
 Assignment 3
 =======================
 ### "Disclaimer"
 The controls and the general player concept was inspired from the HelloCollisions.java example, and crosshairs were taken pretty straight off from HelloPhysics.java.
 
 ### "Features" 
-
 #### Occational World Breach
 In some cases, a box that has gained significant speed or torque might penetrate the ceiling or ground due to *awesome* forces.
 

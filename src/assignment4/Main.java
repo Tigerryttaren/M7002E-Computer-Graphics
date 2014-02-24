@@ -1,5 +1,6 @@
 package assignment4;
  
+import java.util.UUID;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.TextureKey;
 import com.jme3.bullet.BulletAppState;
@@ -8,19 +9,26 @@ import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.CharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.collision.CollisionResult;
+import com.jme3.collision.CollisionResults;
 import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
+import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 
@@ -60,6 +68,9 @@ public class Main extends SimpleApplication implements ActionListener {
 	private static final Box hal9000;
 	private static final Box door;
 	
+	private Geometry picking_marker;
+	private Geometry selected_object;
+	
 	static {
 		ground = new Box(100f, 0.1f, 100f);
 		ground.scaleTextureCoordinates(new Vector2f(6, 6));
@@ -92,7 +103,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		// Make camera to look at scene 
 		cam.setLocation(new Vector3f(0, 4f, 6f));
-		cam.lookAt(new Vector3f(2, 2, 0), Vector3f.UNIT_Y);		
+		cam.lookAt(new Vector3f(-100, 15, 7), Vector3f.UNIT_Y);		
 		
 		// Setting gravity
 		bulletAppState.getPhysicsSpace().setGravity(new Vector3f(0, -9.82f*5, 0));
@@ -113,6 +124,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		initDoor();
 		initPlayer();
 		initCrossHair();	
+		initMark();		
 	}
 
 	// Initialized the key mapping to controls work
@@ -124,20 +136,24 @@ public class Main extends SimpleApplication implements ActionListener {
 		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
 	    
-		// For making the little crates fidget around
-		inputManager.addMapping("BioBox1", new KeyTrigger(KeyInput.KEY_1));
-		inputManager.addMapping("BioBox2", new KeyTrigger(KeyInput.KEY_2));
-		inputManager.addMapping("BioBox3", new KeyTrigger(KeyInput.KEY_3));
-	    
-		// Adding all the listeners
+		inputManager.addMapping("MakeBioBox", new KeyTrigger(KeyInput.KEY_L));
+		//inputManager.addMapping("BioBox2", new KeyTrigger(KeyInput.KEY_2));
+		//inputManager.addMapping("BioBox3", new KeyTrigger(KeyInput.KEY_3));
+		
+		inputManager.addMapping("ForcePush", new KeyTrigger(KeyInput.KEY_F));
+		inputManager.addMapping("ForcePull", new KeyTrigger(KeyInput.KEY_G));
+		inputManager.addMapping("Pick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+	   
 		inputManager.addListener(this, "Forward");
 		inputManager.addListener(this, "Left");
 		inputManager.addListener(this, "Backward");
 		inputManager.addListener(this, "Right"); 
 		inputManager.addListener(this, "Jump");
-		inputManager.addListener(this, "BioBox1");
-		inputManager.addListener(this, "BioBox2");
-		inputManager.addListener(this, "BioBox3");
+		inputManager.addListener(this, "ForcePush");
+		inputManager.addListener(this, "ForcePull");
+		inputManager.addListener(this, "MakeBioBox");
+		
+		inputManager.addListener(this, "Pick");
 	}
 	
 	@Override
@@ -178,35 +194,95 @@ public class Main extends SimpleApplication implements ActionListener {
 			if (is_pressed == true) { 
 				player.jump(); 
 			}
-		} else if (key_binding.equals("BioBox1")) { 
+		} else if (key_binding.equals("ForcePush")) { 
 			if (is_pressed == true) {	
-				manipulateCrate1(tpf);
+				forcePush(tpf);
 			}	    	
-		} else if (key_binding.equals("BioBox2")) {
+		} else if (key_binding.equals("ForcePull")) {
 			if (is_pressed == true) {
-				manipulateCrate2(tpf);
+				forcePull(tpf);
 			}
-		} else if (key_binding.equals("BioBox3")) {
+		} else if (key_binding.equals("MakeBioBox")) {
 			if (is_pressed == true) {
-				manipulateCrate3(tpf);
+				operationMakeBioBox(tpf);
 			}
-		} 
+		} else if (key_binding.equals("Pick")) {
+			if (is_pressed == false) { 
+				
+				CollisionResults results = new CollisionResults();
+				Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+				manipulatables.collideWith(ray, results);
+				
+				try {
+					selected_object = results.getClosestCollision().getGeometry();
+				} catch (NullPointerException npe) {
+					//TODO: This should not happen. When I too far from object i want to pick, it crashes? Machen sie die fixxxen hier, bitte!
+					// Pass
+				}
+				
+				if (results.size() > 0) {
+					CollisionResult closest = results.getClosestCollision();
+					picking_marker.setLocalTranslation(closest.getContactPoint());
+					rootNode.attachChild(picking_marker);
+				} else {
+					rootNode.detachChild(picking_marker);
+				}
+			}		
+		}
 	}
 	
-	// Making a crate do stuff
-	public void manipulateCrate1(float tpf) {
-		Spatial spatial = manipulatables.getChild("BioBox1");
-		spatial.getControl(RigidBodyControl.class).applyCentralForce(new Vector3f(0f, 10000f, 0f));
+	public void forcePush(float tpf) {
+		// Handling not selected any object
+		if (selected_object == null) {
+			return;
+		}
+		
+		String name = selected_object.getName();
+		Spatial spatial = manipulatables.getChild(name);
+		Vector3f direction = cam.getDirection();
+		spatial.getControl(RigidBodyControl.class).applyImpulse(direction.mult(250), new Vector3f(0, 0, 0));
 	}
 	
-	public void manipulateCrate2(float tpf) {
-		Spatial spatial = manipulatables.getChild("BioBox2");
-		spatial.getControl(RigidBodyControl.class).applyCentralForce(new Vector3f(0f, 10000f, 0f));
-		spatial.getControl(RigidBodyControl.class).applyTorque(new Vector3f(0f, 4000f, 0f));
+	public void forcePull(float tpf) {
+		// Handling not selected any object
+		if (selected_object == null) {
+			return;
+		}
+		
+		String name = selected_object.getName();
+		Spatial spatial = manipulatables.getChild(name);
+		Vector3f direction = cam.getDirection();
+		spatial.getControl(RigidBodyControl.class).applyImpulse(direction.mult(250).negate(), new Vector3f(0, 0, 0));
 	}
-	public void manipulateCrate3(float tpf) {
-		Spatial spatial = manipulatables.getChild("BioBox3");
-		spatial.getControl(RigidBodyControl.class).applyTorque(new Vector3f(0f, 20000f, 0f));
+	
+	public void operationMakeBioBox(float tpf) {
+		Vector3f location = cam.getLocation();
+		Vector3f direction = cam.getDirection();
+		
+		float trans_x = location.getX() + (5) * direction.getX();
+		float trans_y = location.getY() + (5) * direction.getY();
+		float trans_z = location.getZ() + (5) * direction.getZ();
+		float rad = 2;
+		float rot_x = 0;
+		float rot_y = 0;
+		float rot_z = 0;
+		float scale = 1;
+		float mass = 9;
+		String name = UUID.randomUUID().toString();
+		
+		manipulatables.attachChild(makeBioBox(trans_x, trans_y, trans_z, rad, rot_x, rot_y, rot_z, scale, mass, name));
+	}
+	
+	//TODO: Make mesh box instead of stupid clown nose?
+	private void initMark() {
+		Sphere mark = new Sphere(30, 30, 0.1f);
+		//Box mark = new Box(1f, 1f, 1f);
+		//Geometry mark = selected_object.clone();
+		//mark.scale(1.1f);
+		picking_marker = new Geometry("Pick", mark);
+		Material picking_marker_mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		picking_marker_mat.setColor("Color", ColorRGBA.Green);	
+		picking_marker.setMaterial(picking_marker_mat);
 	}
  
 	// Materials used in the scene
