@@ -1,4 +1,4 @@
-package assignment3;
+package assignment4;
  
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.TextureKey;
@@ -8,8 +8,6 @@ import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.CharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
-import com.jme3.cinematic.MotionPath;
-import com.jme3.cinematic.events.MotionEvent;
 import com.jme3.font.BitmapText;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
@@ -23,7 +21,6 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
-import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 
@@ -42,23 +39,14 @@ public class Main extends SimpleApplication implements ActionListener {
  
 	private BulletAppState bulletAppState;	
 	private Node manipulatables;
-	
-	private MotionPath motionpath1;
-	private MotionPath motionpath2;
-	private MotionPath motionpath3;
-	
-	private MotionEvent motioncontrol1;
-	private MotionEvent motioncontrol2;
-	private MotionEvent motioncontrol3;
     
 	Material ground_material;
 	Material ceiling_material;	
 	Material wall_material;
-	Material crate_material;
+	Material biobox_material;
+	Material containmentcontainer_material;
 	Material hal9000_material;
 	Material door_material;
-	Material ball_material;
-	Material drone_material;
 	
 	private RigidBodyControl ground_physical;
 	private RigidBodyControl ceiling_physical;
@@ -71,10 +59,8 @@ public class Main extends SimpleApplication implements ActionListener {
 	private static final Box wall;
 	private static final Box hal9000;
 	private static final Box door;
-	private static final Sphere ball;
 	
 	static {
-		// Ground geometry
 		ground = new Box(100f, 0.1f, 100f);
 		ground.scaleTextureCoordinates(new Vector2f(6, 6));
     	
@@ -89,9 +75,6 @@ public class Main extends SimpleApplication implements ActionListener {
     	
 		door = new Box(0.5f, 5.3f, 4.5f);
 		door.scaleTextureCoordinates(new Vector2f(3, 6));
-    	
-		ball = new Sphere(32,32, 1f);
-		ball.scaleTextureCoordinates(new Vector2f(3, 6));
 	}
 	
 	public static void main(String args[]) {
@@ -124,86 +107,14 @@ public class Main extends SimpleApplication implements ActionListener {
 		initGround();
 		initCeiling();
 		initWalls();
-		initDrones();
-		initMotions();
-		initCrates();
+		initContainmentContainers();
+		initBioBoxes();
 		initHal9000();
 		initDoor();
-		initBall();
 		initPlayer();
-		initCrossHair();		
+		initCrossHair();	
 	}
-	
-	public void initMotions() {
-		// Makes the motion path for the first drone
-		Spatial spatial1 = manipulatables.getChild("Drone1");
-		initMotionPath1(spatial1);
-		
-		// Makes the motion path for the second drone
-		Spatial spatial2 = manipulatables.getChild("Drone2");
-		initMotionPath2(spatial2);
-		
-		// Makes the motion path for the third drone
-		Spatial spatial3 = manipulatables.getChild("Drone3");
-		initMotionPath3(spatial3);
-	}
-	
-	public void initMotionPath1 (Spatial spatial) {
-		// Drawing the animation path
-		motionpath1 = new MotionPath();
-		motionpath1.addWayPoint(new Vector3f(75, 10, 75));
-		motionpath1.addWayPoint(new Vector3f(75, 10, -75));
-		motionpath1.addWayPoint(new Vector3f(-75, 10, -75));
-		motionpath1.addWayPoint(new Vector3f(-75, 10, 75));
-		 
-		// Closing it into a cycle
-		motionpath1.setCycle(true);
-		 
-		motioncontrol1 = new MotionEvent(spatial, motionpath1);
-		motioncontrol1.setDirectionType(MotionEvent.Direction.PathAndRotation);
-		motioncontrol1.setRotation(new Quaternion().fromAngleNormalAxis(FastMath.HALF_PI, Vector3f.UNIT_X));
-		motioncontrol1.setInitialDuration(10f);
-		motioncontrol1.setSpeed(0.5f);       
-	}
-	
-	public void initMotionPath2 (Spatial spatial) {
-		// Drawing the animation path
-		motionpath2 = new MotionPath();
-		
-		motionpath2.addWayPoint(new Vector3f(-30, 40, 30));
-		motionpath2.addWayPoint(new Vector3f(-30, 40, -30));
-		motionpath2.addWayPoint(new Vector3f(30, 40, -30));
-		motionpath2.addWayPoint(new Vector3f(30, 40, 30));
-		
-		 
-		// Closing it into a cycle
-		motionpath2.setCycle(true);
-		
-		motioncontrol2 = new MotionEvent(spatial, motionpath2);
-		motioncontrol2.setDirectionType(MotionEvent.Direction.PathAndRotation);
-		motioncontrol2.setRotation(new Quaternion().fromAngleNormalAxis(FastMath.HALF_PI, Vector3f.UNIT_X));
-		motioncontrol2.setInitialDuration(10f);
-		motioncontrol2.setSpeed(1f);       
-	}
-	
-	public void initMotionPath3 (Spatial spatial) {
-		// Drawing the animation path
-		motionpath3 = new MotionPath();
-		motionpath3.addWayPoint(new Vector3f(15, 20, 15));
-		motionpath3.addWayPoint(new Vector3f(15, 20, -15));
-		motionpath3.addWayPoint(new Vector3f(-15, 20, -15));
-		motionpath3.addWayPoint(new Vector3f(-15, 20, 15));
-		 
-		// Closing it into a cycle
-		motionpath3.setCycle(true);
-		
-		motioncontrol3 = new MotionEvent(spatial, motionpath3);
-		motioncontrol3.setDirectionType(MotionEvent.Direction.PathAndRotation);
-		motioncontrol3.setRotation(new Quaternion().fromAngleNormalAxis(FastMath.HALF_PI, Vector3f.UNIT_X));
-		motioncontrol3.setInitialDuration(10f);
-		motioncontrol3.setSpeed(0.5f);       
-	}
-	
+
 	// Initialized the key mapping to controls work
 	private void initKeys() {
 		// For moving the player
@@ -214,17 +125,9 @@ public class Main extends SimpleApplication implements ActionListener {
 		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
 	    
 		// For making the little crates fidget around
-		inputManager.addMapping("Crate1", new KeyTrigger(KeyInput.KEY_1));
-		inputManager.addMapping("Crate2", new KeyTrigger(KeyInput.KEY_2));
-		inputManager.addMapping("Crate3", new KeyTrigger(KeyInput.KEY_3));
-	    
-		// For the drones
-		inputManager.addMapping("Drone1", new KeyTrigger(KeyInput.KEY_7));
-		inputManager.addMapping("Drone2", new KeyTrigger(KeyInput.KEY_8));
-		inputManager.addMapping("Drone3", new KeyTrigger(KeyInput.KEY_9));
-	    
-		// For the red rubber ball
-		inputManager.addMapping("BounceBall", new KeyTrigger(KeyInput.KEY_B));
+		inputManager.addMapping("BioBox1", new KeyTrigger(KeyInput.KEY_1));
+		inputManager.addMapping("BioBox2", new KeyTrigger(KeyInput.KEY_2));
+		inputManager.addMapping("BioBox3", new KeyTrigger(KeyInput.KEY_3));
 	    
 		// Adding all the listeners
 		inputManager.addListener(this, "Forward");
@@ -232,13 +135,9 @@ public class Main extends SimpleApplication implements ActionListener {
 		inputManager.addListener(this, "Backward");
 		inputManager.addListener(this, "Right"); 
 		inputManager.addListener(this, "Jump");
-		inputManager.addListener(this, "Crate1");
-		inputManager.addListener(this, "Crate2");
-		inputManager.addListener(this, "Crate3");
-		inputManager.addListener(this, "BounceBall");
-		inputManager.addListener(this, "Drone1");
-		inputManager.addListener(this, "Drone2");
-		inputManager.addListener(this, "Drone3");
+		inputManager.addListener(this, "BioBox1");
+		inputManager.addListener(this, "BioBox2");
+		inputManager.addListener(this, "BioBox3");
 	}
 	
 	@Override
@@ -279,55 +178,35 @@ public class Main extends SimpleApplication implements ActionListener {
 			if (is_pressed == true) { 
 				player.jump(); 
 			}
-		} else if (key_binding.equals("Crate1")) { 
+		} else if (key_binding.equals("BioBox1")) { 
 			if (is_pressed == true) {	
 				manipulateCrate1(tpf);
 			}	    	
-		} else if (key_binding.equals("Crate2")) {
+		} else if (key_binding.equals("BioBox2")) {
 			if (is_pressed == true) {
 				manipulateCrate2(tpf);
 			}
-		} else if (key_binding.equals("Crate3")) {
+		} else if (key_binding.equals("BioBox3")) {
 			if (is_pressed == true) {
 				manipulateCrate3(tpf);
-			}
-		} else if (key_binding.equals("BounceBall")) {
-			if (is_pressed == true) {
-				bounceBall();
-			}
-		} else if (key_binding.equals("Drone1")) {
-			if (is_pressed == true) {
-				motioncontrol1.play();
-			}
-		} else if (key_binding.equals("Drone2")) {
-			if (is_pressed == true) {
-				motioncontrol2.play();
-			}
-		} else if (key_binding.equals("Drone3")) {
-			if (is_pressed == true) {
-				motioncontrol3.play();
 			}
 		} 
 	}
 	
 	// Making a crate do stuff
 	public void manipulateCrate1(float tpf) {
-		Spatial spatial = manipulatables.getChild("Crate1");
+		Spatial spatial = manipulatables.getChild("BioBox1");
 		spatial.getControl(RigidBodyControl.class).applyCentralForce(new Vector3f(0f, 10000f, 0f));
 	}
 	
 	public void manipulateCrate2(float tpf) {
-		Spatial spatial = manipulatables.getChild("Crate2");
+		Spatial spatial = manipulatables.getChild("BioBox2");
 		spatial.getControl(RigidBodyControl.class).applyCentralForce(new Vector3f(0f, 10000f, 0f));
 		spatial.getControl(RigidBodyControl.class).applyTorque(new Vector3f(0f, 4000f, 0f));
 	}
 	public void manipulateCrate3(float tpf) {
-		Spatial spatial = manipulatables.getChild("Crate3");
+		Spatial spatial = manipulatables.getChild("BioBox3");
 		spatial.getControl(RigidBodyControl.class).applyTorque(new Vector3f(0f, 20000f, 0f));
-	}
-	public void bounceBall() {
-		Spatial spatial = manipulatables.getChild("Ball");
-		spatial.getControl(RigidBodyControl.class).applyCentralForce(new Vector3f(0f, 1500f, 0f));
 	}
  
 	// Materials used in the scene
@@ -364,12 +243,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		door_key.setGenerateMips(true);
 		Texture door_texture = assetManager.loadTexture(door_key);
 		door_material.setTexture("ColorMap", door_texture);
-	    
-		ball_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		TextureKey ball_key = new TextureKey("ball.jpg");
-		ball_key.setGenerateMips(true);
-		Texture ball_texture = assetManager.loadTexture(ball_key);
-		ball_material.setTexture("ColorMap", ball_texture);
 	}
 	
 	// Make the player
@@ -446,27 +319,57 @@ public class Main extends SimpleApplication implements ActionListener {
 		return wall_geometry;
 	}
 	
-	// Making all crates
-	public void initCrates() {
-		// Small crates
-		manipulatables.attachChild(makeCrate(-75f, 1.5f, 10f, 2, 0, 0, 0, 1.5f, 9f, "Crate1"));
-		manipulatables.attachChild(makeCrate(-75f, 1.5f, 0, 2, 0, 0, 0, 1.5f, 9f, "Crate2"));	
-		manipulatables.attachChild(makeCrate(-75f, 1.5f, -10f, 2, 0, 0, 0, 1.5f, 9f, "Crate3"));
-		
+	// Making all ContainmentContainers
+	public void initContainmentContainers() {
 		// Large corner crates
-		rootNode.attachChild(makeCrate(50, 15, 50, 2, 0, 0, 0, 10, 1000f, "CornerCrate1"));
-		rootNode.attachChild(makeCrate(-50, 15, 50, 2, 0, 0, 0, 10, 1000f, "CornerCrate2"));
-		rootNode.attachChild(makeCrate(50, 15, -50, 2, 0, 0, 0, 10, 1000f, "CornerCrate3"));	
-		rootNode.attachChild(makeCrate(-50, 15, -50, 2, 0, 0, 0, 10, 1000f, "CornerCrate4"));
+		rootNode.attachChild(makeContainmentContainer(50, 15, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer1"));
+		rootNode.attachChild(makeContainmentContainer(-50, 15, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer2"));
+		rootNode.attachChild(makeContainmentContainer(50, 15, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer3"));	
+		rootNode.attachChild(makeContainmentContainer(-50, 15, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer4"));
 	}
 	
-	// Making a single crate
-	private Geometry makeCrate(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale, float mass, String name) {
+	// Making a single ContainmentContainer
+	private Geometry makeContainmentContainer(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale, float mass, String name) {
 		Box cube = new Box(1f, 1f, 1f);
 		Geometry cube_geometry = new Geometry(name, cube);
 		cube_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
 		Material cube_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture cube_texture = assetManager.loadTexture("crate.jpg");
+		Texture cube_texture = assetManager.loadTexture("containmentcontainer.png");
+		cube_material.setTexture("ColorMap", cube_texture);
+	    
+		// Using a quaternion to save a rotation to be used on the wall
+		Quaternion rotate90 = new Quaternion(); 
+		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));
+		cube_geometry.setLocalRotation(rotate90);
+	 
+		cube_geometry.setLocalScale(scale);
+		cube_geometry.setMaterial(cube_material);
+	    
+		// Adding a collision box to geometry
+		CollisionShape cube_shape = CollisionShapeFactory.createBoxShape(cube_geometry);
+		RigidBodyControl cube_physical = new RigidBodyControl(cube_shape, mass);
+	    	    
+		cube_physical.setFriction(5f);
+		cube_geometry.addControl(cube_physical);
+		bulletAppState.getPhysicsSpace().add(cube_physical);
+		return cube_geometry;
+	}
+	
+	// Making the BioBoxes
+	public void initBioBoxes() {
+		// Small crates
+		manipulatables.attachChild(makeBioBox(-75f, 1.5f, 10f, 2, 0, 0, 0, 1.5f, 9f, "BioBox1"));
+		manipulatables.attachChild(makeBioBox(-75f, 1.5f, 0, 2, 0, 0, 0, 1.5f, 9f, "BioBox2"));	
+		manipulatables.attachChild(makeBioBox(-75f, 1.5f, -10f, 2, 0, 0, 0, 1.5f, 9f, "BioBox3"));
+	}
+	
+	// Making a single BioBox
+	private Geometry makeBioBox(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale, float mass, String name) {
+		Box cube = new Box(1f, 1f, 1f);
+		Geometry cube_geometry = new Geometry(name, cube);
+		cube_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
+		Material cube_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		Texture cube_texture = assetManager.loadTexture("biohazard.png");
 		cube_material.setTexture("ColorMap", cube_texture);
 	    
 		// Using a quaternion to save a rotation to be used on the wall
@@ -535,7 +438,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
 		door_geometry.setLocalRotation(rotate90);
 		
-		// Experimented with these values and this gave goo resutls
+		// Experimented with these values and this gave good resutls
 		door_geometry.getMesh().scaleTextureCoordinates(new Vector2f(0.335f, 0.166f));
 		
 		// Creates the physical with mass as argument
@@ -545,65 +448,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		return door_geometry;
 	}
 	
-	public void initBall(){
-		manipulatables.attachChild(makeBall(-15f, 10f, 10f, 2, 0, 0, 0, 1.0f, 1f, "Ball"));
-	}
-	
-	private Geometry makeBall(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale, float mass, String name) {
-		Geometry ball_geometry = new Geometry(name, ball);
-		ball_geometry.setMaterial(ball_material);
-		
-		// Translating to its location
-		ball_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
-		ball_geometry.setLocalScale(scale);
-		
-		// Using a quaternion to save a rotation to be used
-		Quaternion rotate90 = new Quaternion(); 
-		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
-		ball_geometry.setLocalRotation(rotate90);
-		
-		// Experimental values that gave good results
-		ball_geometry.getMesh().scaleTextureCoordinates(new Vector2f(0.335f, 0.166f));
-		
-		// Adding a collision shape to the ball
-		CollisionShape ball_shape = CollisionShapeFactory.createDynamicMeshShape(ball_geometry);
-		RigidBodyControl ball_physical = new RigidBodyControl(ball_shape, mass);
-		
-		ball_geometry.addControl(ball_physical);
-		bulletAppState.getPhysicsSpace().add(ball_physical);
-		return ball_geometry;
-	}
-	
-	public void initDrones() {
-		manipulatables.attachChild(makeDrone(75f, 10f, 75f, 2, 1, 0, 0, 1.0f, 0f, "Drone1"));
-		manipulatables.attachChild(makeDrone(-30f, 40f, 30f, 2, 1, 0, 0, 1.0f, 0f, "Drone2"));
-		manipulatables.attachChild(makeDrone(15f, 20f, 15f, 2, 1, 0, 0, 1.0f, 0f, "Drone3"));
-	}
-	
-	private Geometry makeDrone(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale, float mass, String name) {
-		Sphere drone = new Sphere(32, 32, 1f);
-		Geometry drone_geometry = new Geometry(name, drone);
-		drone_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
-		Material drone_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture drone_texture = assetManager.loadTexture("drone.jpg");
-		drone_material.setTexture("ColorMap", drone_texture);
-		
-		// Using a quaternion to save a rotation to be used
-		Quaternion rotate90 = new Quaternion(); 
-		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
-		drone_geometry.setLocalRotation(rotate90);
-		
-		drone_geometry.setLocalScale(scale);
-		drone_geometry.setMaterial(drone_material);
-		
-		CollisionShape drone_shape = CollisionShapeFactory.createDynamicMeshShape(drone_geometry);
-		RigidBodyControl drone_physical = new RigidBodyControl(drone_shape, mass);
-		
-		drone_geometry.addControl(drone_physical);
-		bulletAppState.getPhysicsSpace().add(drone_physical);
-		return drone_geometry;
-	}
- 
 	// Crosshairs
 	protected void initCrossHair() {
 		guiNode.detachAllChildren();
