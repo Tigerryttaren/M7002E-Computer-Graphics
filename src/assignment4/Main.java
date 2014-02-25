@@ -1,6 +1,7 @@
 package assignment4;
  
 import java.util.UUID;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.TextureKey;
 import com.jme3.bullet.BulletAppState;
@@ -17,6 +18,7 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -28,7 +30,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
-import com.jme3.scene.shape.Sphere;
+import com.jme3.scene.shape.Cylinder;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 
@@ -46,8 +48,15 @@ public class Main extends SimpleApplication implements ActionListener {
 	private boolean right = false;
  
 	private BulletAppState bulletAppState;	
+	
 	private Node manipulatables;
+    private Node inventory;
+    private Node announcer;
     
+    private Vector3f last_position;
+    private Vector3f last_scale;
+    private RigidBodyControl last_physical;
+	
 	Material ground_material;
 	Material ceiling_material;	
 	Material wall_material;
@@ -62,23 +71,29 @@ public class Main extends SimpleApplication implements ActionListener {
 	private RigidBodyControl hal9000_physical;
 	private RigidBodyControl door_physical;
 	
+	//private RigidBodyControl creator_physical;
+
 	private static final Box ground;
 	private static final Box ceiling;
 	private static final Box wall;
 	private static final Box hal9000;
 	private static final Box door;
 	
-	private Geometry picking_marker;
-	private Geometry selected_object;
+	private static final Cylinder creator;
+	private static final Cylinder destroyer;
+	
+	//private Geometry picking_marker;
+	//private Geometry selected_object;
+	private Spatial selected_object;
 	
 	static {
-		ground = new Box(100f, 0.1f, 100f);
+		ground = new Box(100f, 2f, 100f);
 		ground.scaleTextureCoordinates(new Vector2f(6, 6));
     	
-		ceiling = new Box(100f, 0.1f, 100f);
+		ceiling = new Box(100f, 2f, 100f);
 		ceiling.scaleTextureCoordinates(new Vector2f(6, 6));
     	
-		wall = new Box(0.1f, 100f, 100f);
+		wall = new Box(2f, 100f, 100f);
 		wall.scaleTextureCoordinates(new Vector2f(6, 6));
     	
 		hal9000 = new Box(0.5f, 6f, 2f);
@@ -86,6 +101,12 @@ public class Main extends SimpleApplication implements ActionListener {
     	
 		door = new Box(0.5f, 5.3f, 4.5f);
 		door.scaleTextureCoordinates(new Vector2f(3, 6));
+		
+		creator = new Cylinder(10, 50, 0.1f, 3f, true);
+		creator.scaleTextureCoordinates(new Vector2f(0.5f, 1f));
+		
+		destroyer = new Cylinder(10, 50, 0.1f, 3f, true);
+		destroyer.scaleTextureCoordinates(new Vector2f(1f, 1f));
 	}
 	
 	public static void main(String args[]) {
@@ -110,7 +131,18 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		// A node to contain all objects that can and should be manipulated in some way
 		manipulatables = new Node("Manipulatables");
-		rootNode.attachChild(manipulatables);
+		announcer = new Node("Announcer");
+		
+		inventory = new Node("Inventory");
+		guiNode.attachChild(inventory);
+		guiNode.attachChild(announcer);
+		
+		//TODO: Experimental
+		DirectionalLight sun = new DirectionalLight();
+		sun.setDirection(new Vector3f(0, 0, -1.0f));
+		guiNode.addLight(sun);
+		
+		rootNode.attachChild(manipulatables);	
 		
 		// Initializing the world and all control and so forth and so on forever and forever
 		initKeys();
@@ -124,7 +156,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		initDoor();
 		initPlayer();
 		initCrossHair();	
-		initMark();		
+		initCreator();
+		initDestroyer();		
 	}
 
 	// Initialized the key mapping to controls work
@@ -136,22 +169,18 @@ public class Main extends SimpleApplication implements ActionListener {
 		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
 	    
-		inputManager.addMapping("MakeBioBox", new KeyTrigger(KeyInput.KEY_L));
-		//inputManager.addMapping("BioBox2", new KeyTrigger(KeyInput.KEY_2));
-		//inputManager.addMapping("BioBox3", new KeyTrigger(KeyInput.KEY_3));
-		
-		inputManager.addMapping("ForcePush", new KeyTrigger(KeyInput.KEY_F));
-		inputManager.addMapping("ForcePull", new KeyTrigger(KeyInput.KEY_G));
+		inputManager.addMapping("Use", new KeyTrigger(KeyInput.KEY_E));
 		inputManager.addMapping("Pick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+		//TODO: Change to key T
+		inputManager.addMapping("Throw", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 	   
 		inputManager.addListener(this, "Forward");
 		inputManager.addListener(this, "Left");
 		inputManager.addListener(this, "Backward");
 		inputManager.addListener(this, "Right"); 
 		inputManager.addListener(this, "Jump");
-		inputManager.addListener(this, "ForcePush");
-		inputManager.addListener(this, "ForcePull");
-		inputManager.addListener(this, "MakeBioBox");
+		inputManager.addListener(this, "Throw");
+		inputManager.addListener(this, "Use");
 		
 		inputManager.addListener(this, "Pick");
 	}
@@ -178,6 +207,24 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		player.setWalkDirection(walking_direction);
 		cam.setLocation(player.getPhysicsLocation());
+		
+		// Handling the text announcements
+		if (!(selected_object == null)) {
+			guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+			BitmapText text = new BitmapText(guiFont, false);
+			text.setSize(guiFont.getCharSet().getRenderedSize()*2);
+			
+			if (selected_object.getName().equals("Destroyer")) {
+				text.setText("Wielding the Destroyer!");        
+			} else if (selected_object.getName().equals("Creator")) {
+				text.setText("Wielding the Creator!");      
+			} else {
+				text.setText("");
+			}
+			//TODO: Adjust text to right place on screen
+			text.setLocalTranslation(settings.getWidth()/6 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/6 + text.getLineHeight()/6, 0);
+			announcer.attachChild(text);
+		}
 	}
 	
 	// Actions performed when button is pressed
@@ -194,44 +241,105 @@ public class Main extends SimpleApplication implements ActionListener {
 			if (is_pressed == true) { 
 				player.jump(); 
 			}
-		} else if (key_binding.equals("ForcePush")) { 
+		} else if (key_binding.equals("Throw")) { 
 			if (is_pressed == true) {	
-				forcePush(tpf);
+				
+				if (selected_object == null) {
+					return;
+				} else if (inventory.getChildren().isEmpty() == false) {
+					Spatial spatial = inventory.getChild(0);
+					spatial.setLocalScale(last_scale);
+					
+					Vector3f location = cam.getLocation();
+					Vector3f direction = cam.getDirection();
+					float trans_x = location.getX() + (1) * direction.getX();
+					float trans_y = location.getY() + (1) * direction.getY();
+					float trans_z = location.getZ() + (1) * direction.getZ();
+					Vector3f new_position = new Vector3f(trans_x, trans_y, trans_z);
+					
+					last_physical.setPhysicsLocation(new_position);
+					spatial.setLocalTranslation(new_position);
+					spatial.addControl(last_physical);
+					
+					bulletAppState.getPhysicsSpace().add(last_physical);
+					
+					inventory.detachAllChildren();
+					manipulatables.attachChild(spatial);	
+					
+					thrownObject();
+					selected_object = null;
+					announcer.detachAllChildren();
+				}
 			}	    	
-		} else if (key_binding.equals("ForcePull")) {
+		} else if (key_binding.equals("Use")) {
 			if (is_pressed == true) {
-				forcePull(tpf);
-			}
-		} else if (key_binding.equals("MakeBioBox")) {
-			if (is_pressed == true) {
-				operationMakeBioBox(tpf);
+				// Check that you are holding the some item, else do not allow action
+				if (inventory.getChildren().isEmpty() == false) {
+					if (inventory.getChild(0).getName().equals("Creator") == true) {
+						operationCreate(tpf);
+					} else if (inventory.getChild(0).getName().equals("Destroyer") == true) {
+						operationDestroy(tpf);
+					} else {
+						return;
+					}
+				} else {
+					return;
+				}
 			}
 		} else if (key_binding.equals("Pick")) {
-			if (is_pressed == false) { 
-				
-				CollisionResults results = new CollisionResults();
-				Ray ray = new Ray(cam.getLocation(), cam.getDirection());
-				manipulatables.collideWith(ray, results);
-				
-				try {
-					selected_object = results.getClosestCollision().getGeometry();
-				} catch (NullPointerException npe) {
-					//TODO: This should not happen. When I too far from object i want to pick, it crashes? Machen sie die fixxxen hier, bitte!
-					// Pass
-				}
-				
-				if (results.size() > 0) {
-					CollisionResult closest = results.getClosestCollision();
-					picking_marker.setLocalTranslation(closest.getContactPoint());
-					rootNode.attachChild(picking_marker);
+			if (is_pressed == false) {
+				// If holding an item and clicking you put it down
+				if (inventory.getChildren().isEmpty() == false) {
+					Spatial spatial = inventory.getChild(0);
+					spatial.setLocalScale(last_scale);
+					
+					Vector3f location = cam.getLocation();
+					Vector3f direction = cam.getDirection();
+					float trans_x = location.getX() + (7) * direction.getX();
+					float trans_y = location.getY() + (7) * direction.getY();
+					float trans_z = location.getZ() + (7) * direction.getZ();
+					Vector3f new_position = new Vector3f(trans_x, trans_y, trans_z);
+					
+					last_physical.setPhysicsLocation(new_position);
+					spatial.setLocalTranslation(new_position);
+					spatial.addControl(last_physical);
+					
+					bulletAppState.getPhysicsSpace().add(last_physical);
+					
+					inventory.detachAllChildren();
+					manipulatables.attachChild(spatial);	
+					
+					selected_object = null;
+					announcer.detachAllChildren();
 				} else {
-					rootNode.detachChild(picking_marker);
+					CollisionResults collisions = new CollisionResults();
+					Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+					manipulatables.collideWith(ray, collisions);
+					
+					if (collisions.size() > 0) {
+						CollisionResult closest = collisions.getClosestCollision();
+						Spatial spatial = closest.getGeometry();
+						last_scale = spatial.getLocalScale().clone();
+						last_position = spatial.getLocalTranslation().clone();
+						
+						last_physical = spatial.getControl(RigidBodyControl.class);
+						bulletAppState.getPhysicsSpace().remove(last_physical);
+						spatial.removeControl(RigidBodyControl.class);
+						
+						manipulatables.detachChild(spatial);
+						inventory.attachChild(spatial);
+						
+						spatial.setLocalScale(150f);
+						spatial.setLocalTranslation(settings.getWidth()/2, settings.getHeight()/2, 0);	
+						
+						selected_object = spatial;
+					}  
 				}
 			}		
 		}
 	}
 	
-	public void forcePush(float tpf) {
+	public void thrownObject() {
 		// Handling not selected any object
 		if (selected_object == null) {
 			return;
@@ -240,22 +348,10 @@ public class Main extends SimpleApplication implements ActionListener {
 		String name = selected_object.getName();
 		Spatial spatial = manipulatables.getChild(name);
 		Vector3f direction = cam.getDirection();
-		spatial.getControl(RigidBodyControl.class).applyImpulse(direction.mult(250), new Vector3f(0, 0, 0));
+		spatial.getControl(RigidBodyControl.class).applyImpulse(direction.mult(500), new Vector3f(0, 0, 0));
 	}
 	
-	public void forcePull(float tpf) {
-		// Handling not selected any object
-		if (selected_object == null) {
-			return;
-		}
-		
-		String name = selected_object.getName();
-		Spatial spatial = manipulatables.getChild(name);
-		Vector3f direction = cam.getDirection();
-		spatial.getControl(RigidBodyControl.class).applyImpulse(direction.mult(250).negate(), new Vector3f(0, 0, 0));
-	}
-	
-	public void operationMakeBioBox(float tpf) {
+	public void operationCreate(float tpf) {
 		Vector3f location = cam.getLocation();
 		Vector3f direction = cam.getDirection();
 		
@@ -273,16 +369,18 @@ public class Main extends SimpleApplication implements ActionListener {
 		manipulatables.attachChild(makeBioBox(trans_x, trans_y, trans_z, rad, rot_x, rot_y, rot_z, scale, mass, name));
 	}
 	
-	//TODO: Make mesh box instead of stupid clown nose?
-	private void initMark() {
-		Sphere mark = new Sphere(30, 30, 0.1f);
-		//Box mark = new Box(1f, 1f, 1f);
-		//Geometry mark = selected_object.clone();
-		//mark.scale(1.1f);
-		picking_marker = new Geometry("Pick", mark);
-		Material picking_marker_mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		picking_marker_mat.setColor("Color", ColorRGBA.Green);	
-		picking_marker.setMaterial(picking_marker_mat);
+	public void operationDestroy(float tpf) {
+		CollisionResults collisions = new CollisionResults();
+		Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+		manipulatables.collideWith(ray, collisions);
+		
+		if (collisions.size() > 0) {
+			CollisionResult closest = collisions.getClosestCollision();
+			Spatial spatial = closest.getGeometry();
+			bulletAppState.getPhysicsSpace().remove(spatial.getControl(RigidBodyControl.class));
+			spatial.removeControl(RigidBodyControl.class);
+			manipulatables.detachChild(spatial);
+		}  
 	}
  
 	// Materials used in the scene
@@ -339,7 +437,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	private Geometry makeGround() {
 		Geometry ground_geometry = new Geometry("Ground", ground);
 		ground_geometry.setMaterial(ground_material);
-		ground_geometry.setLocalTranslation(0, 0, 0);
+		ground_geometry.setLocalTranslation(0, -2, 0);
 		this.rootNode.attachChild(ground_geometry);
 		
 		// Creates the ground physical with a mass 0.0f
@@ -357,7 +455,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	private Geometry makeCeiling() {
 		Geometry ceiling_geometry = new Geometry("Ceiling", ceiling);
 		ceiling_geometry.setMaterial(ceiling_material);
-		ceiling_geometry.setLocalTranslation(0, 60f, 0);
+		ceiling_geometry.setLocalTranslation(0, 62f, 0);
 		this.rootNode.attachChild(ceiling_geometry);
 		
 		// Creates the ground physical with a mass 0.0f
@@ -431,9 +529,67 @@ public class Main extends SimpleApplication implements ActionListener {
 		return cube_geometry;
 	}
 	
+	public void initCreator() {
+		manipulatables.attachChild(makeCreator());
+	}
+	
+	private Geometry makeCreator() {
+		Geometry creator_geometry = new Geometry("Creator", creator);
+		creator_geometry.setLocalTranslation(new Vector3f(-50, 2, 5f));
+		Material creator_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		Texture creator_texture = assetManager.loadTexture("white_wood.jpg");
+		creator_material.setTexture("ColorMap", creator_texture);
+	    
+		// Using a quaternion to save a rotation to be used on the wall
+		Quaternion rotate90 = new Quaternion(); 
+		rotate90.fromAngleAxis(FastMath.PI/2, new Vector3f(0, 0, 0));
+		creator_geometry.setLocalRotation(rotate90);
+	 
+		creator_geometry.setLocalScale(1f);
+		creator_geometry.setMaterial(creator_material);
+	    
+		// Adding a collision box to geometry
+		CollisionShape creator_shape = CollisionShapeFactory.createBoxShape(creator_geometry);
+		RigidBodyControl creator_physical = new RigidBodyControl(creator_shape, 10f);
+	    	    
+		creator_physical.setFriction(5f);
+		creator_geometry.addControl(creator_physical);
+		bulletAppState.getPhysicsSpace().add(creator_physical);
+		return creator_geometry;
+	}
+	
+	public void initDestroyer() {
+		manipulatables.attachChild(makeDestroyer());
+	}
+	
+	private Geometry makeDestroyer() {
+		Geometry destroyer_geometry = new Geometry("Destroyer", destroyer);
+		destroyer_geometry.setLocalTranslation(new Vector3f(-50, 2, -5f));
+		Material destroyer_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		Texture destroyer_texture = assetManager.loadTexture("black_wood.jpg");
+		destroyer_material.setTexture("ColorMap", destroyer_texture);
+		
+		// Using a quaternion to save a rotation to be used on the wall
+		Quaternion rotate90 = new Quaternion(); 
+		rotate90.fromAngleAxis(FastMath.PI/2, new Vector3f(0, 0, 0));
+		destroyer_geometry.setLocalRotation(rotate90);
+	 
+		destroyer_geometry.setLocalScale(1f);
+		destroyer_geometry.setMaterial(destroyer_material);
+	    
+		// Adding a collision box to geometry
+		CollisionShape destroyer_shape = CollisionShapeFactory.createBoxShape(destroyer_geometry);
+		RigidBodyControl destroyer_physical = new RigidBodyControl(destroyer_shape, 10f);
+	    	    
+		destroyer_physical.setFriction(5f);
+		destroyer_geometry.addControl(destroyer_physical);
+		bulletAppState.getPhysicsSpace().add(destroyer_physical);
+		return destroyer_geometry;
+	}
+	
 	// Making the BioBoxes
 	public void initBioBoxes() {
-		// Small crates
+		// BioBoxes
 		manipulatables.attachChild(makeBioBox(-75f, 1.5f, 10f, 2, 0, 0, 0, 1.5f, 9f, "BioBox1"));
 		manipulatables.attachChild(makeBioBox(-75f, 1.5f, 0, 2, 0, 0, 0, 1.5f, 9f, "BioBox2"));	
 		manipulatables.attachChild(makeBioBox(-75f, 1.5f, -10f, 2, 0, 0, 0, 1.5f, 9f, "BioBox3"));
@@ -468,7 +624,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 	// Making all HAL9000s
 	public void initHal9000(){
-		rootNode.attachChild(makeHal9000(-101.6f, 30, 0, 2, 0, 0, 0, 4));
+		rootNode.attachChild(makeHal9000(-99.6f, 30, 0, 2, 0, 0, 0, 4));
 	}
 	
 	// Make a single HAL9000
@@ -526,7 +682,10 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 	// Crosshairs
 	protected void initCrossHair() {
-		guiNode.detachAllChildren();
+		// Hiding stat box
+		setDisplayStatView(false);
+		
+		//guiNode.detachAllChildren();
 		guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
 		BitmapText crosshairs = new BitmapText(guiFont, false);
 		
