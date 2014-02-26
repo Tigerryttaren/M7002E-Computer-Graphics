@@ -19,6 +19,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
+import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -53,7 +54,7 @@ public class Main extends SimpleApplication implements ActionListener {
     private Node inventory;
     private Node announcer;
     
-    private Vector3f last_position;
+    //private Vector3f last_position;
     private Vector3f last_scale;
     private RigidBodyControl last_physical;
 	
@@ -70,8 +71,6 @@ public class Main extends SimpleApplication implements ActionListener {
 	private RigidBodyControl wall_physical;
 	private RigidBodyControl hal9000_physical;
 	private RigidBodyControl door_physical;
-	
-	//private RigidBodyControl creator_physical;
 
 	private static final Box ground;
 	private static final Box ceiling;
@@ -82,8 +81,6 @@ public class Main extends SimpleApplication implements ActionListener {
 	private static final Cylinder creator;
 	private static final Cylinder destroyer;
 	
-	//private Geometry picking_marker;
-	//private Geometry selected_object;
 	private Spatial selected_object;
 	
 	static {
@@ -103,10 +100,10 @@ public class Main extends SimpleApplication implements ActionListener {
 		door.scaleTextureCoordinates(new Vector2f(3, 6));
 		
 		creator = new Cylinder(10, 50, 0.1f, 3f, true);
-		creator.scaleTextureCoordinates(new Vector2f(0.5f, 1f));
+		creator.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
 		
 		destroyer = new Cylinder(10, 50, 0.1f, 3f, true);
-		destroyer.scaleTextureCoordinates(new Vector2f(1f, 1f));
+		destroyer.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
 	}
 	
 	public static void main(String args[]) {
@@ -137,12 +134,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		guiNode.attachChild(inventory);
 		guiNode.attachChild(announcer);
 		
-		//TODO: Experimental
-		DirectionalLight sun = new DirectionalLight();
-		sun.setDirection(new Vector3f(0, 0, -1.0f));
-		guiNode.addLight(sun);
-		
 		rootNode.attachChild(manipulatables);	
+		
 		
 		// Initializing the world and all control and so forth and so on forever and forever
 		initKeys();
@@ -150,6 +143,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		initGround();
 		initCeiling();
 		initWalls();
+		initLight();
 		initContainmentContainers();
 		initBioBoxes();
 		initHal9000();
@@ -158,6 +152,26 @@ public class Main extends SimpleApplication implements ActionListener {
 		initCrossHair();	
 		initCreator();
 		initDestroyer();		
+	}
+	
+	public void initLight() {
+		
+		DirectionalLight sun = new DirectionalLight();
+		sun.setDirection(new Vector3f(0, 0, -1.0f));
+		guiNode.addLight(sun);
+		
+		PointLight light_hal = new PointLight();
+		light_hal.setColor(ColorRGBA.Red);
+		light_hal.setRadius(6000f);
+		light_hal.setPosition(new Vector3f(-95, 20, 0));
+		rootNode.addLight(light_hal);
+		
+		PointLight light_ceiling = new PointLight();
+		light_ceiling.setColor(ColorRGBA.White);
+		light_ceiling.setRadius(600f);
+		light_ceiling.setPosition(new Vector3f(0, 50, 0));
+		rootNode.addLight(light_ceiling);
+
 	}
 
 	// Initialized the key mapping to controls work
@@ -171,8 +185,8 @@ public class Main extends SimpleApplication implements ActionListener {
 	    
 		inputManager.addMapping("Use", new KeyTrigger(KeyInput.KEY_E));
 		inputManager.addMapping("Pick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-		//TODO: Change to key T
-		inputManager.addMapping("Throw", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+		inputManager.addMapping("Drop", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+		inputManager.addMapping("Throw", new KeyTrigger(KeyInput.KEY_T));
 	   
 		inputManager.addListener(this, "Forward");
 		inputManager.addListener(this, "Left");
@@ -181,6 +195,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		inputManager.addListener(this, "Jump");
 		inputManager.addListener(this, "Throw");
 		inputManager.addListener(this, "Use");
+		inputManager.addListener(this, "Drop");
 		
 		inputManager.addListener(this, "Pick");
 	}
@@ -221,8 +236,7 @@ public class Main extends SimpleApplication implements ActionListener {
 			} else {
 				text.setText("");
 			}
-			//TODO: Adjust text to right place on screen
-			text.setLocalTranslation(settings.getWidth()/6 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/6 + text.getLineHeight()/6, 0);
+			text.setLocalTranslation(settings.getWidth()/38 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/12 + text.getLineHeight()/6, 0);
 			announcer.attachChild(text);
 		}
 	}
@@ -246,27 +260,20 @@ public class Main extends SimpleApplication implements ActionListener {
 				
 				if (selected_object == null) {
 					return;
-				} else if (inventory.getChildren().isEmpty() == false) {
-					Spatial spatial = inventory.getChild(0);
-					spatial.setLocalScale(last_scale);
-					
-					Vector3f location = cam.getLocation();
-					Vector3f direction = cam.getDirection();
-					float trans_x = location.getX() + (1) * direction.getX();
-					float trans_y = location.getY() + (1) * direction.getY();
-					float trans_z = location.getZ() + (1) * direction.getZ();
-					Vector3f new_position = new Vector3f(trans_x, trans_y, trans_z);
-					
-					last_physical.setPhysicsLocation(new_position);
-					spatial.setLocalTranslation(new_position);
-					spatial.addControl(last_physical);
-					
-					bulletAppState.getPhysicsSpace().add(last_physical);
-					
-					inventory.detachAllChildren();
-					manipulatables.attachChild(spatial);	
-					
-					thrownObject();
+				} else if (inventory.getChildren().isEmpty() == false) {					
+					operationDrop();
+					operationThrow();
+					selected_object = null;
+					announcer.detachAllChildren();
+				}
+			}	    	
+		} else if (key_binding.equals("Drop")) { 
+			if (is_pressed == true) {	
+				
+				if (selected_object == null) {
+					return;
+				} else if (inventory.getChildren().isEmpty() == false) {					
+					operationDrop();
 					selected_object = null;
 					announcer.detachAllChildren();
 				}
@@ -290,25 +297,7 @@ public class Main extends SimpleApplication implements ActionListener {
 			if (is_pressed == false) {
 				// If holding an item and clicking you put it down
 				if (inventory.getChildren().isEmpty() == false) {
-					Spatial spatial = inventory.getChild(0);
-					spatial.setLocalScale(last_scale);
-					
-					Vector3f location = cam.getLocation();
-					Vector3f direction = cam.getDirection();
-					float trans_x = location.getX() + (7) * direction.getX();
-					float trans_y = location.getY() + (7) * direction.getY();
-					float trans_z = location.getZ() + (7) * direction.getZ();
-					Vector3f new_position = new Vector3f(trans_x, trans_y, trans_z);
-					
-					last_physical.setPhysicsLocation(new_position);
-					spatial.setLocalTranslation(new_position);
-					spatial.addControl(last_physical);
-					
-					bulletAppState.getPhysicsSpace().add(last_physical);
-					
-					inventory.detachAllChildren();
-					manipulatables.attachChild(spatial);	
-					
+					operationDrop();
 					selected_object = null;
 					announcer.detachAllChildren();
 				} else {
@@ -320,7 +309,7 @@ public class Main extends SimpleApplication implements ActionListener {
 						CollisionResult closest = collisions.getClosestCollision();
 						Spatial spatial = closest.getGeometry();
 						last_scale = spatial.getLocalScale().clone();
-						last_position = spatial.getLocalTranslation().clone();
+						//last_position = spatial.getLocalTranslation().clone();
 						
 						last_physical = spatial.getControl(RigidBodyControl.class);
 						bulletAppState.getPhysicsSpace().remove(last_physical);
@@ -339,7 +328,28 @@ public class Main extends SimpleApplication implements ActionListener {
 		}
 	}
 	
-	public void thrownObject() {
+	public void operationDrop(){
+		Spatial spatial = inventory.getChild(0);
+		spatial.setLocalScale(last_scale);
+		
+		Vector3f location = cam.getLocation();
+		Vector3f direction = cam.getDirection();
+		float trans_x = location.getX() + (2) * direction.getX();
+		float trans_y = location.getY() + (2) * direction.getY();
+		float trans_z = location.getZ() + (2) * direction.getZ();
+		Vector3f new_position = new Vector3f(trans_x, trans_y, trans_z);
+		
+		last_physical.setPhysicsLocation(new_position);
+		spatial.setLocalTranslation(new_position);
+		spatial.addControl(last_physical);
+		
+		bulletAppState.getPhysicsSpace().add(last_physical);
+		
+		inventory.detachAllChildren();
+		manipulatables.attachChild(spatial);
+	}
+	
+	public void operationThrow() {
 		// Handling not selected any object
 		if (selected_object == null) {
 			return;
@@ -385,38 +395,40 @@ public class Main extends SimpleApplication implements ActionListener {
  
 	// Materials used in the scene
 	public void initMaterials() { 
-		ceiling_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		ceiling_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey ceiling_key = new TextureKey("black_tile.png");
 		ceiling_key.setGenerateMips(true);
 		Texture ceiling_texture = assetManager.loadTexture(ceiling_key);
 		ceiling_texture.setWrap(WrapMode.Repeat);
-		ceiling_material.setTexture("ColorMap", ceiling_texture);
+		ceiling_material.setTexture("DiffuseMap", ceiling_texture);
 		
-		wall_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		wall_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey wall_key = new TextureKey("black_tile.png");
+		//TextureKey wall_key = new TextureKey("white_brick_wall.jpg");
 		wall_key.setGenerateMips(true);
 		Texture wall_texture = assetManager.loadTexture(wall_key);
 		wall_texture.setWrap(WrapMode.Repeat);
-		wall_material.setTexture("ColorMap", wall_texture);
+		wall_material.setTexture("DiffuseMap", wall_texture);
 		
-		ground_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		ground_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey ground_key = new TextureKey("black_tile.png");
 		ground_key.setGenerateMips(true);
 		Texture ground_texture = assetManager.loadTexture(ground_key);
 		ground_texture.setWrap(WrapMode.Repeat);
-		ground_material.setTexture("ColorMap", ground_texture);
+		ground_material.setTexture("DiffuseMap", ground_texture);
 	
-		hal9000_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		//hal9000_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		hal9000_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey hal9000_key = new TextureKey("HAL9000.jpg");
 		hal9000_key.setGenerateMips(true);
 		Texture hal9000_texture = assetManager.loadTexture(hal9000_key);
-		hal9000_material.setTexture("ColorMap", hal9000_texture);
+		hal9000_material.setTexture("DiffuseMap", hal9000_texture);
 	    
-		door_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		door_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey door_key = new TextureKey("dark_steel_door.jpg");
 		door_key.setGenerateMips(true);
 		Texture door_texture = assetManager.loadTexture(door_key);
-		door_material.setTexture("ColorMap", door_texture);
+		door_material.setTexture("DiffuseMap", door_texture);
 	}
 	
 	// Make the player
@@ -496,10 +508,21 @@ public class Main extends SimpleApplication implements ActionListener {
 	// Making all ContainmentContainers
 	public void initContainmentContainers() {
 		// Large corner crates
-		rootNode.attachChild(makeContainmentContainer(50, 15, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer1"));
-		rootNode.attachChild(makeContainmentContainer(-50, 15, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer2"));
-		rootNode.attachChild(makeContainmentContainer(50, 15, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer3"));	
-		rootNode.attachChild(makeContainmentContainer(-50, 15, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer4"));
+		rootNode.attachChild(makeContainmentContainer(50, 10.1f, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer1"));
+		rootNode.attachChild(makeContainmentContainer(50, 30.1f, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer2"));
+		rootNode.attachChild(makeContainmentContainer(29, 10.1f, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer3"));		
+		rootNode.attachChild(makeContainmentContainer(50, 10.1f, 29, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer4"));
+	
+		rootNode.attachChild(makeContainmentContainer(-50, 30.1f, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer5"));
+		rootNode.attachChild(makeContainmentContainer(-50, 10.1f, 50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer6"));
+		
+		rootNode.attachChild(makeContainmentContainer(29, 10.1f, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer7"));
+		rootNode.attachChild(makeContainmentContainer(50, 10.1f, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer8"));	
+		rootNode.attachChild(makeContainmentContainer(50, 30.1f, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer9"));	
+		rootNode.attachChild(makeContainmentContainer(50, 10.1f, -29, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer10"));	
+		
+		rootNode.attachChild(makeContainmentContainer(-50, 30.1f, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer11"));
+		rootNode.attachChild(makeContainmentContainer(-50, 10.1f, -50, 2, 0, 0, 0, 10, 1000f, "ContainmentContainer12"));
 	}
 	
 	// Making a single ContainmentContainer
@@ -507,9 +530,10 @@ public class Main extends SimpleApplication implements ActionListener {
 		Box cube = new Box(1f, 1f, 1f);
 		Geometry cube_geometry = new Geometry(name, cube);
 		cube_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
-		Material cube_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		Material cube_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		Texture cube_texture = assetManager.loadTexture("containmentcontainer.png");
-		cube_material.setTexture("ColorMap", cube_texture);
+		//Texture cube_texture = assetManager.loadTexture("crate.jpg");
+		cube_material.setTexture("DiffuseMap", cube_texture);
 	    
 		// Using a quaternion to save a rotation to be used on the wall
 		Quaternion rotate90 = new Quaternion(); 
@@ -536,9 +560,9 @@ public class Main extends SimpleApplication implements ActionListener {
 	private Geometry makeCreator() {
 		Geometry creator_geometry = new Geometry("Creator", creator);
 		creator_geometry.setLocalTranslation(new Vector3f(-50, 2, 5f));
-		Material creator_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture creator_texture = assetManager.loadTexture("white_wood.jpg");
-		creator_material.setTexture("ColorMap", creator_texture);
+		Material creator_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+		Texture creator_texture = assetManager.loadTexture("rod_green.jpg");
+		creator_material.setTexture("DiffuseMap", creator_texture);
 	    
 		// Using a quaternion to save a rotation to be used on the wall
 		Quaternion rotate90 = new Quaternion(); 
@@ -565,9 +589,9 @@ public class Main extends SimpleApplication implements ActionListener {
 	private Geometry makeDestroyer() {
 		Geometry destroyer_geometry = new Geometry("Destroyer", destroyer);
 		destroyer_geometry.setLocalTranslation(new Vector3f(-50, 2, -5f));
-		Material destroyer_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture destroyer_texture = assetManager.loadTexture("black_wood.jpg");
-		destroyer_material.setTexture("ColorMap", destroyer_texture);
+		Material destroyer_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+		Texture destroyer_texture = assetManager.loadTexture("rod_red.jpg");
+		destroyer_material.setTexture("DiffuseMap", destroyer_texture);
 		
 		// Using a quaternion to save a rotation to be used on the wall
 		Quaternion rotate90 = new Quaternion(); 
@@ -600,10 +624,17 @@ public class Main extends SimpleApplication implements ActionListener {
 		Box cube = new Box(1f, 1f, 1f);
 		Geometry cube_geometry = new Geometry(name, cube);
 		cube_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
-		Material cube_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		//Material cube_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		Material cube_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		Texture cube_texture = assetManager.loadTexture("biohazard.png");
-		cube_material.setTexture("ColorMap", cube_texture);
-	    
+		//cube_material.setTexture("ColorMap", cube_texture);
+		//cube_material.setTexture("SpecularMap", cube_texture);
+		cube_material.setTexture("DiffuseMap", cube_texture);
+		
+		cube_material.setColor("Diffuse", ColorRGBA.White);
+		cube_material.setColor("Specular", ColorRGBA.White);
+		//cube_material.setBoolean("UseMaterialColors", true);
+		
 		// Using a quaternion to save a rotation to be used on the wall
 		Quaternion rotate90 = new Quaternion(); 
 		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));
@@ -653,7 +684,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 	// Making all doors
 	public void initDoor(){
-		rootNode.attachChild((makeDoor(8, 6, 100.4f, 2, 0, 1, 0, 1.2f)));
+		rootNode.attachChild((makeDoor(8, 6, 98.4f, 2, 0, 1, 0, 1.2f)));
 	}
 	
 	// Making a single door
