@@ -20,6 +20,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
+import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -27,11 +28,13 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
+import com.jme3.shadow.SpotLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 
@@ -156,22 +159,49 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 	public void initLight() {
 		
-		DirectionalLight sun = new DirectionalLight();
-		sun.setDirection(new Vector3f(0, 0, -1.0f));
-		guiNode.addLight(sun);
+		// Adding a light to the HUD
+		DirectionalLight hud_light = new DirectionalLight();
+		hud_light.setDirection(new Vector3f(0, 0, -1.0f));
+		guiNode.addLight(hud_light);
 		
-		PointLight light_hal = new PointLight();
-		light_hal.setColor(ColorRGBA.Red);
-		light_hal.setRadius(6000f);
-		light_hal.setPosition(new Vector3f(-95, 20, 0));
-		rootNode.addLight(light_hal);
-		
+		// Adding a light from the ceiling
 		PointLight light_ceiling = new PointLight();
 		light_ceiling.setColor(ColorRGBA.White);
 		light_ceiling.setRadius(600f);
 		light_ceiling.setPosition(new Vector3f(0, 50, 0));
 		rootNode.addLight(light_ceiling);
-
+		
+		// Adding a point light from HAL
+		PointLight light_hal = new PointLight();
+		light_hal.setColor(ColorRGBA.White);
+		light_hal.setRadius(6000f);
+		light_hal.setPosition(new Vector3f(-95, 20, 0));
+		rootNode.addLight(light_hal);
+	
+		// Adding a spotlight from HAL
+		SpotLight spot = new SpotLight();
+		spot.setSpotRange(200f);                           
+		spot.setSpotInnerAngle(45f * FastMath.DEG_TO_RAD); 		// Inner light cone, central beam
+		spot.setSpotOuterAngle(90f * FastMath.DEG_TO_RAD); 		// Outer light cone, edge of the light
+		spot.setColor(ColorRGBA.White.mult(1.3f));         		// Light color
+		spot.setPosition(new Vector3f(-90, 20, 0));
+		spot.setDirection(new Vector3f(1, 0, 0));
+		rootNode.addLight(spot);
+		
+		
+		// Shadows
+        /*final int SHADOWMAP_SIZE = 1024;
+        SpotLightShadowRenderer dlsr = new SpotLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
+        dlsr.setLight(spot);
+        viewPort.addProcessor(dlsr);*/
+ 
+        /*SpotLightShadowFilter dlsf = new SpotLightShadowFilter(assetManager, SHADOWMAP_SIZE, 3);
+        dlsf.setLight(spot);
+        dlsf.setEnabled(true);
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        fpp.addFilter(dlsf);
+        viewPort.addProcessor(fpp);*/
+        
 	}
 
 	// Initialized the key mapping to controls work
@@ -334,9 +364,9 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		Vector3f location = cam.getLocation();
 		Vector3f direction = cam.getDirection();
-		float trans_x = location.getX() + (2) * direction.getX();
-		float trans_y = location.getY() + (2) * direction.getY();
-		float trans_z = location.getZ() + (2) * direction.getZ();
+		float trans_x = location.getX() + (7) * direction.getX();
+		float trans_y = location.getY() + (7) * direction.getY();
+		float trans_z = location.getZ() + (7) * direction.getZ();
 		Vector3f new_position = new Vector3f(trans_x, trans_y, trans_z);
 		
 		last_physical.setPhysicsLocation(new_position);
@@ -345,6 +375,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		bulletAppState.getPhysicsSpace().add(last_physical);
 		
+		last_physical.activate();
 		inventory.detachAllChildren();
 		manipulatables.attachChild(spatial);
 	}
@@ -452,6 +483,10 @@ public class Main extends SimpleApplication implements ActionListener {
 		ground_geometry.setLocalTranslation(0, -2, 0);
 		this.rootNode.attachChild(ground_geometry);
 		
+		
+		ground_geometry.setShadowMode(ShadowMode.Receive);
+		
+		
 		// Creates the ground physical with a mass 0.0f
 		ground_physical = new RigidBodyControl(0.0f);
 		ground_geometry.addControl(ground_physical);
@@ -492,6 +527,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		// Translating the wall to its location
 		wall_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
+		
+		wall_geometry.setShadowMode(ShadowMode.Receive);
 		
 		// Using a quaternion to save a rotation to be used on the wall
 		Quaternion rotate90 = new Quaternion(); 
@@ -542,6 +579,8 @@ public class Main extends SimpleApplication implements ActionListener {
 	 
 		cube_geometry.setLocalScale(scale);
 		cube_geometry.setMaterial(cube_material);
+		
+		cube_geometry.setShadowMode(ShadowMode.CastAndReceive);
 	    
 		// Adding a collision box to geometry
 		CollisionShape cube_shape = CollisionShapeFactory.createBoxShape(cube_geometry);

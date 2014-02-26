@@ -6,19 +6,28 @@ Student project at Luleå Tekniska Universitet.
 Assignment 4
 =======================
 # TODO
-### Add Light Source
-From HALs eye? From the ceiling?
-### Add another point of view
+### Add Light Model
+Adding some kind of lamp model.
+
+### Shadows
+Adding some pretty shadows.
+
+### Add Another Point of View
 From HALs view. A red tint. Limited camera movement.
 
+### Adding the Enlarger
+Magic rof for enlarging.
 
+### Adding the Shrinker
+Magic rod for shrinking.
 
 ### "Disclaimer"
 The controls and the general player concept was inspired from the **HelloCollisions.java** example, and crosshairs were taken pretty straight off from **HelloPhysics.java**. The **HelloPicking.java** example was used for learning how to do picking.
 
 ### "Features" aka Bugs
-##### Gravirty-Defiant BioBoxes
-When a box is picked up and placed in the world again, sometimes it floats mid-air, untill something collides with it, then normal behaviour is assumed.
+#### Boundary-Penetrating Rod-Like Objects
+When an object is thrown upwards, it might penetrate the floor when falling down. Possibly just make the floow thicker or DENSER? Changing bulletAppState to update more often? Refresh times on collision, increase them?
+
 
 ### Required Features Implemented
 ##### Supports Egocentric Locomotion
