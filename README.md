@@ -3,19 +3,28 @@ M7002E Computer Graphics With Virtual Environments
 Student project at Luleå Tekniska Universitet.
 
 =======================
+ToDo List
+=======================
+#### Important
+
+##### Disable the Fricking Camera Scrolling
+##### Adding Limited Pickup Distance
+##### Shadows for Multiple Light Sources
+##### Limit Camera Panning in Other Point of View
+
+#### Not-So-Important
+
+##### Adding Some Player Model
+##### Adding the Enlarger
+##### Adding the Shrinker
+
+
+
+
+
+=======================
 Assignment 4
 =======================
-# TODO
-
-### Disable the Fricking Camera Scrolling
-### Adding Limited Pickup Distance
-### Shadows for Multiple Light Sources
-### Limit Camera Panning in Other Point of View
-
-### Adding the Enlarger
-### Adding the Shrinker
-
-
 ### "Disclaimer"
 The controls and the general player concept was inspired from the **HelloCollisions.java** example, and crosshairs were taken pretty straight off from **HelloPhysics.java**. The **HelloPicking.java** example was used for learning how to do picking.
 
@@ -32,10 +41,10 @@ The concept of a player, who can move around, is affected by gravity, can manipu
 Direct selection is implemented. The player has the ability to aim at an object and select it.
 
 ##### At Least Two Point of Views
+THe user can switch camera view between the player character and the evil red surveilance eye a la HAL9000.
 
 ##### Look Somewhat Natural
-Utilizing pretty textures from the internet and rudimentary physics, the scene looks and feels at least somewhat natural.
-
+Utilizing pretty textures from the internet and rudimentary physics, the scene looks and feels at least somewhat natural. Also, acceptably realistic shadows are used.
 
 ### Instructions
 #### Moving the Player
@@ -45,10 +54,10 @@ Use the **WASD** and **SPACE** keys to move around the environment, as well as *
 Left-click the **MOUSE** to pick an object up, left-click again to simply drop the object. Right-clicking when holding an object will throw it away with force. Using the **E** key when holding some objects will make the player use the object on the environment.
 
 ##### The Creator
-This ancient artifact in the form of a white stick is a powerful tool, it allows the player to magically create new boxes.
+This ancient artifact in the form of a green rod is a powerful tool, it allows the player to magically create new boxes.
 
 ##### The Destroyer
-The evil twin of the Creator, the black stick called the Destroyer will destroy the boxes it is used on. 
+The evil twin of the Creator, the red rod called the Destroyer will destroy the boxes it is used on. 
 
 ##### BioBoxes
 These small red boxes containing extremely hazardous biological waste can be tossed around in an playful manner, but cannot really be used as anything other than a building block.

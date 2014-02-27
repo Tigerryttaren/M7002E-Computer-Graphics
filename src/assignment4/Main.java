@@ -61,7 +61,7 @@ public class Main extends SimpleApplication implements ActionListener {
     
     private int camera_position = 0;
     private Vector3f last_player_camera_direction;
-    private Vector3f last_player_camera_location;
+    //private Vector3f last_player_camera_location;
     private Vector3f last_hal_camera_direction = new Vector3f(15f,  0f, 0f);
     
     
@@ -155,7 +155,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		rootNode.attachChild(manipulatables);	
 		
-		
 		// Initializing the world and all control and so forth and so on forever and forever
 		initKeys();
 		initMaterials();
@@ -176,7 +175,6 @@ public class Main extends SimpleApplication implements ActionListener {
 	}
 	
 	public void initLight() {
-		
 		// Adding a light to the HUD
 		DirectionalLight hud_light = new DirectionalLight();
 		hud_light.setDirection(new Vector3f(0, 0, -1.0f));
@@ -267,44 +265,30 @@ public class Main extends SimpleApplication implements ActionListener {
 		}
 		
 		player.setWalkDirection(walking_direction);
-		//cam.setLocation(player.getPhysicsLocation());
 		
-	
-		//TODO: switch cam
 		if (camera_position == 0) {
 			cam.setLocation(player.getPhysicsLocation());
 		} else if (camera_position == 1) {
 			cam.setLocation(new Vector3f(-97f, 26.5f, 0));
 			
+			//TODO: Limit camera rotation
 			
-			/*
-			//TODO: Typ funkar
-			if (cam.getUp().y < 0) {
+			
+			// ALMOST working, but not really
+			/*if (cam.getUp().y < 0) {
 				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
 			} 
 			 */
 			
-			/*//TODO: Typ funkar
-			if (cam.getUp().y < FastMath.QUARTER_PI) {
-				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
-			} */
 			
-			
-			
-			if (cam.getDirection().y > FastMath.QUARTER_PI /*|| cam.getDirection().y < -FastMath.QUARTER_PI*/) { 
+			// More like it, but not really. 
+			/*if (cam.getDirection().y > FastMath.QUARTER_PI || cam.getDirection().y < -FastMath.QUARTER_PI) { 
 				
 				//Vector3f cam_dir = cam.getDirection();
 				//Vector3f camera = new Vector3f(cam_dir.getX(), FastMath.QUARTER_PI, cam_dir.getZ());
 				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getDirection().x, 0, cam.getDirection().z));
-			}
-			
-	
-			
-			
-			
+			}*/
 		}
-		
-		
 		
 		// Handling the text announcements
 		if (!(selected_object == null)) {
@@ -331,7 +315,7 @@ public class Main extends SimpleApplication implements ActionListener {
 				if (camera_position == 0) {
 					// Switching to HAL9000 mode
 					last_player_camera_direction = cam.getDirection();
-					last_player_camera_location = cam.getLocation();
+					//last_player_camera_location = cam.getLocation();
 					
 					guiNode.attachChild(hal_mode);
 					
@@ -431,7 +415,8 @@ public class Main extends SimpleApplication implements ActionListener {
 				}		
 			} 
 		} else if (camera_position == 1) {
-			
+			// What should HAL900 be able to do?
+			// Just look pretty?
 			
 			
 			
@@ -670,8 +655,6 @@ public class Main extends SimpleApplication implements ActionListener {
 	 
 		cube_geometry.setLocalScale(scale);
 		cube_geometry.setMaterial(cube_material);
-		
-		//cube_geometry.setShadowMode(ShadowMode.CastAndReceive);
 	    
 		// Adding a collision box to geometry
 		CollisionShape cube_shape = CollisionShapeFactory.createBoxShape(cube_geometry);
@@ -754,15 +737,12 @@ public class Main extends SimpleApplication implements ActionListener {
 		Box cube = new Box(1f, 1f, 1f);
 		Geometry cube_geometry = new Geometry(name, cube);
 		cube_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
-		//Material cube_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		Material cube_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		Texture cube_texture = assetManager.loadTexture("biohazard.png");
-		//cube_material.setTexture("ColorMap", cube_texture);
-		//cube_material.setTexture("SpecularMap", cube_texture);
 		cube_material.setTexture("DiffuseMap", cube_texture);
 		
-		cube_material.setColor("Diffuse", ColorRGBA.White);
-		cube_material.setColor("Specular", ColorRGBA.White);
+		//cube_material.setColor("Diffuse", ColorRGBA.White);
+		//cube_material.setColor("Specular", ColorRGBA.White);
 		//cube_material.setBoolean("UseMaterialColors", true);
 		
 		// Using a quaternion to save a rotation to be used on the wall
