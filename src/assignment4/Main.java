@@ -20,7 +20,6 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
-import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -34,9 +33,10 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
-import com.jme3.shadow.SpotLightShadowRenderer;
+import com.jme3.shadow.PointLightShadowRenderer;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
+import com.jme3.ui.Picture;
 
 @SuppressWarnings("deprecation")
 public class Main extends SimpleApplication implements ActionListener {
@@ -57,6 +57,14 @@ public class Main extends SimpleApplication implements ActionListener {
     private Node inventory;
     private Node announcer;
     
+    private Picture hal_mode;
+    
+    private int camera_position = 0;
+    private Vector3f last_player_camera_direction;
+    private Vector3f last_player_camera_location;
+    private Vector3f last_hal_camera_direction = new Vector3f(15f,  0f, 0f);
+    
+    
     //private Vector3f last_position;
     private Vector3f last_scale;
     private RigidBodyControl last_physical;
@@ -68,18 +76,21 @@ public class Main extends SimpleApplication implements ActionListener {
 	Material containmentcontainer_material;
 	Material hal9000_material;
 	Material door_material;
+	Material lamp_material;
 	
 	private RigidBodyControl ground_physical;
 	private RigidBodyControl ceiling_physical;
 	private RigidBodyControl wall_physical;
 	private RigidBodyControl hal9000_physical;
 	private RigidBodyControl door_physical;
+	private RigidBodyControl lamp_physical;
 
 	private static final Box ground;
 	private static final Box ceiling;
 	private static final Box wall;
 	private static final Box hal9000;
 	private static final Box door;
+	private static final Box lamp;
 	
 	private static final Cylinder creator;
 	private static final Cylinder destroyer;
@@ -98,6 +109,9 @@ public class Main extends SimpleApplication implements ActionListener {
     	
 		hal9000 = new Box(0.5f, 6f, 2f);
 		hal9000.scaleTextureCoordinates(new Vector2f(3, 6));
+		
+		lamp = new Box(3f, 0.1f, 3f);
+		lamp.scaleTextureCoordinates(new Vector2f(1, 1));
     	
 		door = new Box(0.5f, 5.3f, 4.5f);
 		door.scaleTextureCoordinates(new Vector2f(3, 6));
@@ -125,6 +139,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		// Make camera to look at scene 
 		cam.setLocation(new Vector3f(0, 4f, 6f));
 		cam.lookAt(new Vector3f(-100, 15, 7), Vector3f.UNIT_Y);		
+	
+		rootNode.setShadowMode(ShadowMode.CastAndReceive);
 		
 		// Setting gravity
 		bulletAppState.getPhysicsSpace().setGravity(new Vector3f(0, -9.82f*5, 0));
@@ -151,8 +167,10 @@ public class Main extends SimpleApplication implements ActionListener {
 		initBioBoxes();
 		initHal9000();
 		initDoor();
+		initLamp();
 		initPlayer();
-		initCrossHair();	
+		initCrossHair();
+		initHALMode();
 		initCreator();
 		initDestroyer();		
 	}
@@ -177,31 +195,20 @@ public class Main extends SimpleApplication implements ActionListener {
 		light_hal.setRadius(6000f);
 		light_hal.setPosition(new Vector3f(-95, 20, 0));
 		rootNode.addLight(light_hal);
-	
-		// Adding a spotlight from HAL
-		SpotLight spot = new SpotLight();
-		spot.setSpotRange(200f);                           
-		spot.setSpotInnerAngle(45f * FastMath.DEG_TO_RAD); 		// Inner light cone, central beam
-		spot.setSpotOuterAngle(90f * FastMath.DEG_TO_RAD); 		// Outer light cone, edge of the light
-		spot.setColor(ColorRGBA.White.mult(1.3f));         		// Light color
-		spot.setPosition(new Vector3f(-90, 20, 0));
-		spot.setDirection(new Vector3f(1, 0, 0));
-		rootNode.addLight(spot);
 		
 		
 		// Shadows
-        /*final int SHADOWMAP_SIZE = 1024;
-        SpotLightShadowRenderer dlsr = new SpotLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
-        dlsr.setLight(spot);
-        viewPort.addProcessor(dlsr);*/
- 
-        /*SpotLightShadowFilter dlsf = new SpotLightShadowFilter(assetManager, SHADOWMAP_SIZE, 3);
-        dlsf.setLight(spot);
-        dlsf.setEnabled(true);
-        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        fpp.addFilter(dlsf);
-        viewPort.addProcessor(fpp);*/
+		//TODO: Fix so can have multiple light sources with shadows
+		final int SHADOWMAP_SIZE = 512;
+		
+		PointLightShadowRenderer plsr_ceiling = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
+		plsr_ceiling.setLight(light_ceiling);
+        viewPort.addProcessor(plsr_ceiling);
         
+        PointLightShadowRenderer plsr_hal = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
+        plsr_hal.setLight(light_hal);
+        viewPort.addProcessor(plsr_hal);
+		
 	}
 
 	// Initialized the key mapping to controls work
@@ -214,20 +221,29 @@ public class Main extends SimpleApplication implements ActionListener {
 		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
 	    
 		inputManager.addMapping("Use", new KeyTrigger(KeyInput.KEY_E));
+		inputManager.addMapping("Throw", new KeyTrigger(KeyInput.KEY_T));
 		inputManager.addMapping("Pick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
 		inputManager.addMapping("Drop", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-		inputManager.addMapping("Throw", new KeyTrigger(KeyInput.KEY_T));
+		
+		inputManager.addMapping("Switch", new KeyTrigger(KeyInput.KEY_TAB));
 	   
 		inputManager.addListener(this, "Forward");
 		inputManager.addListener(this, "Left");
 		inputManager.addListener(this, "Backward");
 		inputManager.addListener(this, "Right"); 
 		inputManager.addListener(this, "Jump");
+		
 		inputManager.addListener(this, "Throw");
 		inputManager.addListener(this, "Use");
 		inputManager.addListener(this, "Drop");
-		
 		inputManager.addListener(this, "Pick");
+		
+		inputManager.addListener(this, "Switch");
+		
+		//TODO: DOES NOT WORK
+		// Disabling the mouse wheel scroll zoom
+		inputManager.deleteMapping("FLYCAM_ZoomIn");
+		inputManager.deleteMapping("FLYCAM_ZoomOut");
 	}
 	
 	@Override
@@ -251,7 +267,44 @@ public class Main extends SimpleApplication implements ActionListener {
 		}
 		
 		player.setWalkDirection(walking_direction);
-		cam.setLocation(player.getPhysicsLocation());
+		//cam.setLocation(player.getPhysicsLocation());
+		
+	
+		//TODO: switch cam
+		if (camera_position == 0) {
+			cam.setLocation(player.getPhysicsLocation());
+		} else if (camera_position == 1) {
+			cam.setLocation(new Vector3f(-97f, 26.5f, 0));
+			
+			
+			/*
+			//TODO: Typ funkar
+			if (cam.getUp().y < 0) {
+				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
+			} 
+			 */
+			
+			/*//TODO: Typ funkar
+			if (cam.getUp().y < FastMath.QUARTER_PI) {
+				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
+			} */
+			
+			
+			
+			if (cam.getDirection().y > FastMath.QUARTER_PI /*|| cam.getDirection().y < -FastMath.QUARTER_PI*/) { 
+				
+				//Vector3f cam_dir = cam.getDirection();
+				//Vector3f camera = new Vector3f(cam_dir.getX(), FastMath.QUARTER_PI, cam_dir.getZ());
+				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getDirection().x, 0, cam.getDirection().z));
+			}
+			
+	
+			
+			
+			
+		}
+		
+		
 		
 		// Handling the text announcements
 		if (!(selected_object == null)) {
@@ -273,89 +326,122 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 	// Actions performed when button is pressed
 	public void onAction(String key_binding, boolean is_pressed, float tpf) {
-		if (key_binding.equals("Forward")) {
-				forward = is_pressed;
-		} else if (key_binding.equals("Left")) {
-			left = is_pressed;
-		} else if (key_binding.equals("Backward")) {
-			backward = is_pressed;
-		} else if (key_binding.equals("Right")) {
-			right = is_pressed;
-		} else if (key_binding.equals("Jump")) {
-			if (is_pressed == true) { 
-				player.jump(); 
-			}
-		} else if (key_binding.equals("Throw")) { 
-			if (is_pressed == true) {	
-				
-				if (selected_object == null) {
-					return;
-				} else if (inventory.getChildren().isEmpty() == false) {					
-					operationDrop();
-					operationThrow();
-					selected_object = null;
-					announcer.detachAllChildren();
-				}
-			}	    	
-		} else if (key_binding.equals("Drop")) { 
-			if (is_pressed == true) {	
-				
-				if (selected_object == null) {
-					return;
-				} else if (inventory.getChildren().isEmpty() == false) {					
-					operationDrop();
-					selected_object = null;
-					announcer.detachAllChildren();
-				}
-			}	    	
-		} else if (key_binding.equals("Use")) {
+		if (key_binding.equals("Switch")) {		
 			if (is_pressed == true) {
-				// Check that you are holding the some item, else do not allow action
-				if (inventory.getChildren().isEmpty() == false) {
-					if (inventory.getChild(0).getName().equals("Creator") == true) {
-						operationCreate(tpf);
-					} else if (inventory.getChild(0).getName().equals("Destroyer") == true) {
-						operationDestroy(tpf);
+				if (camera_position == 0) {
+					// Switching to HAL9000 mode
+					last_player_camera_direction = cam.getDirection();
+					last_player_camera_location = cam.getLocation();
+					
+					guiNode.attachChild(hal_mode);
+					
+					cam.lookAtDirection(last_hal_camera_direction, Vector3f.UNIT_Y);
+					camera_position = 1;
+					
+				} else if (camera_position == 1) {
+					// Switching to player mode
+					guiNode.detachChild(hal_mode);
+					last_hal_camera_direction = cam.getDirection();
+					cam.lookAtDirection(last_player_camera_direction, Vector3f.UNIT_Y);
+					camera_position = 0;					
+				}
+			}
+		} else if (camera_position == 0) {
+			if (key_binding.equals("Forward")) {
+					forward = is_pressed;
+			} else if (key_binding.equals("Left")) {
+				left = is_pressed;
+			} else if (key_binding.equals("Backward")) {
+				backward = is_pressed;
+			} else if (key_binding.equals("Right")) {
+				right = is_pressed;
+			} else if (key_binding.equals("Jump")) {
+				if (is_pressed == true) { 
+					player.jump(); 
+				}
+			} else if (key_binding.equals("Throw")) { 
+				if (is_pressed == true) {	
+					
+					if (selected_object == null) {
+						return;
+					} else if (inventory.getChildren().isEmpty() == false) {					
+						operationDrop();
+						operationThrow();
+						selected_object = null;
+						announcer.detachAllChildren();
+					}
+				}	    	
+			} else if (key_binding.equals("Drop")) { 
+				if (is_pressed == true) {	
+					
+					if (selected_object == null) {
+						return;
+					} else if (inventory.getChildren().isEmpty() == false) {					
+						operationDrop();
+						selected_object = null;
+						announcer.detachAllChildren();
+					}
+				}	    	
+			} else if (key_binding.equals("Use")) {
+				if (is_pressed == true) {
+					// Check that you are holding the some item, else do not allow action
+					if (inventory.getChildren().isEmpty() == false) {
+						if (inventory.getChild(0).getName().equals("Creator") == true) {
+							operationCreate(tpf);
+						} else if (inventory.getChild(0).getName().equals("Destroyer") == true) {
+							operationDestroy(tpf);
+						} else {
+							return;
+						}
 					} else {
 						return;
 					}
-				} else {
-					return;
 				}
-			}
-		} else if (key_binding.equals("Pick")) {
-			if (is_pressed == false) {
-				// If holding an item and clicking you put it down
-				if (inventory.getChildren().isEmpty() == false) {
-					operationDrop();
-					selected_object = null;
-					announcer.detachAllChildren();
-				} else {
-					CollisionResults collisions = new CollisionResults();
-					Ray ray = new Ray(cam.getLocation(), cam.getDirection());
-					manipulatables.collideWith(ray, collisions);
-					
-					if (collisions.size() > 0) {
-						CollisionResult closest = collisions.getClosestCollision();
-						Spatial spatial = closest.getGeometry();
-						last_scale = spatial.getLocalScale().clone();
-						//last_position = spatial.getLocalTranslation().clone();
+			} else if (key_binding.equals("Pick") && camera_position == 0) {
+				if (is_pressed == false) {
+					// If holding an item and clicking you put it down
+					if (inventory.getChildren().isEmpty() == false) {
+						operationDrop();
+						selected_object = null;
+						announcer.detachAllChildren();
+					} else {
+						CollisionResults collisions = new CollisionResults();
+						Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+						manipulatables.collideWith(ray, collisions);
 						
-						last_physical = spatial.getControl(RigidBodyControl.class);
-						bulletAppState.getPhysicsSpace().remove(last_physical);
-						spatial.removeControl(RigidBodyControl.class);
-						
-						manipulatables.detachChild(spatial);
-						inventory.attachChild(spatial);
-						
-						spatial.setLocalScale(150f);
-						spatial.setLocalTranslation(settings.getWidth()/2, settings.getHeight()/2, 0);	
-						
-						selected_object = spatial;
-					}  
-				}
-			}		
-		}
+						if (collisions.size() > 0) {
+							CollisionResult closest = collisions.getClosestCollision();
+							Spatial spatial = closest.getGeometry();
+							last_scale = spatial.getLocalScale().clone();
+							//last_position = spatial.getLocalTranslation().clone();
+							
+							last_physical = spatial.getControl(RigidBodyControl.class);
+							bulletAppState.getPhysicsSpace().remove(last_physical);
+							spatial.removeControl(RigidBodyControl.class);
+							
+							manipulatables.detachChild(spatial);
+							inventory.attachChild(spatial);
+							
+							spatial.setLocalScale(150f);
+							spatial.setLocalTranslation(settings.getWidth()/2, settings.getHeight()/2, 0);	
+							
+							selected_object = spatial;
+						}  
+					}
+				}		
+			} 
+		} else if (camera_position == 1) {
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		} 
 	}
 	
 	public void operationDrop(){
@@ -435,7 +521,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		wall_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey wall_key = new TextureKey("black_tile.png");
-		//TextureKey wall_key = new TextureKey("white_brick_wall.jpg");
 		wall_key.setGenerateMips(true);
 		Texture wall_texture = assetManager.loadTexture(wall_key);
 		wall_texture.setWrap(WrapMode.Repeat);
@@ -447,8 +532,14 @@ public class Main extends SimpleApplication implements ActionListener {
 		Texture ground_texture = assetManager.loadTexture(ground_key);
 		ground_texture.setWrap(WrapMode.Repeat);
 		ground_material.setTexture("DiffuseMap", ground_texture);
+		
+		lamp_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+		TextureKey lamp_key = new TextureKey("glow.jpg");
+		lamp_key.setGenerateMips(true);
+		Texture lamp_texture = assetManager.loadTexture(lamp_key);
+		//lamp_texture.setWrap(WrapMode.Repeat);
+		lamp_material.setTexture("DiffuseMap", lamp_texture);
 	
-		//hal9000_material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		hal9000_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey hal9000_key = new TextureKey("HAL9000.jpg");
 		hal9000_key.setGenerateMips(true);
@@ -483,10 +574,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		ground_geometry.setLocalTranslation(0, -2, 0);
 		this.rootNode.attachChild(ground_geometry);
 		
-		
 		ground_geometry.setShadowMode(ShadowMode.Receive);
-		
-		
+	
 		// Creates the ground physical with a mass 0.0f
 		ground_physical = new RigidBodyControl(0.0f);
 		ground_geometry.addControl(ground_physical);
@@ -504,6 +593,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		ceiling_geometry.setMaterial(ceiling_material);
 		ceiling_geometry.setLocalTranslation(0, 62f, 0);
 		this.rootNode.attachChild(ceiling_geometry);
+		
+		ceiling_geometry.setShadowMode(ShadowMode.Receive);
 		
 		// Creates the ground physical with a mass 0.0f
 		ceiling_physical = new RigidBodyControl(0.0f);
@@ -580,12 +671,12 @@ public class Main extends SimpleApplication implements ActionListener {
 		cube_geometry.setLocalScale(scale);
 		cube_geometry.setMaterial(cube_material);
 		
-		cube_geometry.setShadowMode(ShadowMode.CastAndReceive);
+		//cube_geometry.setShadowMode(ShadowMode.CastAndReceive);
 	    
 		// Adding a collision box to geometry
 		CollisionShape cube_shape = CollisionShapeFactory.createBoxShape(cube_geometry);
 		RigidBodyControl cube_physical = new RigidBodyControl(cube_shape, mass);
-	    	    
+			    
 		cube_physical.setFriction(5f);
 		cube_geometry.addControl(cube_physical);
 		bulletAppState.getPhysicsSpace().add(cube_physical);
@@ -706,6 +797,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		hal9000_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
 		hal9000_geometry.setLocalScale(scale);
 		
+		hal9000_geometry.setShadowMode(ShadowMode.Receive);
+		
 		// Using a quaternion to save a rotation to be used
 		Quaternion rotate90 = new Quaternion(); 
 		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
@@ -735,6 +828,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		door_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
 		door_geometry.setLocalScale(scale);
 		
+		door_geometry.setShadowMode(ShadowMode.Receive);
+		
 		// Using a quaternion to save a rotation to be used
 		Quaternion rotate90 = new Quaternion(); 
 		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
@@ -748,6 +843,30 @@ public class Main extends SimpleApplication implements ActionListener {
 		door_geometry.addControl(door_physical);
 		bulletAppState.getPhysicsSpace().add(door_physical);
 		return door_geometry;
+	}
+	
+	public void initLamp() {
+		rootNode.attachChild(makeLamp());
+	}
+	
+	private Geometry makeLamp() {
+		Geometry lamp_geometry = new Geometry("Lamp", lamp);
+		lamp_geometry.setMaterial(lamp_material);
+		lamp_geometry.setLocalTranslation(0, 60, 0);
+				
+		lamp_geometry.setShadowMode(ShadowMode.Cast);
+	
+		lamp_physical = new RigidBodyControl(0.0f);
+		lamp_geometry.addControl(lamp_physical);
+		bulletAppState.getPhysicsSpace().add(lamp_physical);	
+		return lamp_geometry;
+	}
+	
+	public void initHALMode() {
+		hal_mode = new Picture("HAL9000 Mode");
+		hal_mode.setImage(assetManager, "hal_mode_filter.png", true);
+		hal_mode.setHeight(settings.getHeight());
+		hal_mode.setWidth(settings.getWidth());	
 	}
 	
 	// Crosshairs

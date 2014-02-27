@@ -6,27 +6,22 @@ Student project at Luleå Tekniska Universitet.
 Assignment 4
 =======================
 # TODO
-### Add Light Model
-Adding some kind of lamp model.
 
-### Shadows
-Adding some pretty shadows.
-
-### Add Another Point of View
-From HALs view. A red tint. Limited camera movement.
+### Disable the Fricking Camera Scrolling
+### Adding Limited Pickup Distance
+### Shadows for Multiple Light Sources
+### Limit Camera Panning in Other Point of View
 
 ### Adding the Enlarger
-Magic rof for enlarging.
-
 ### Adding the Shrinker
-Magic rod for shrinking.
+
 
 ### "Disclaimer"
 The controls and the general player concept was inspired from the **HelloCollisions.java** example, and crosshairs were taken pretty straight off from **HelloPhysics.java**. The **HelloPicking.java** example was used for learning how to do picking.
 
 ### "Features" aka Bugs
 #### Boundary-Penetrating Rod-Like Objects
-When an object is thrown upwards, it might penetrate the floor when falling down. Possibly just make the floow thicker or DENSER? Changing bulletAppState to update more often? Refresh times on collision, increase them?
+When an object is thrown upwards, it might penetrate the floor when falling down. Possibly just make the floow thicker or "denser", somehow? Changing bulletAppState to update more often? Refresh times on collision, increase them?
 
 
 ### Required Features Implemented
@@ -59,10 +54,7 @@ The evil twin of the Creator, the black stick called the Destroyer will destroy 
 These small red boxes containing extremely hazardous biological waste can be tossed around in an playful manner, but cannot really be used as anything other than a building block.
 
 #### Switching Point of View
-**TAB**?
-
-
-
+Use the **TAB** key to switch between the point of view of the player and the point of view of HAL9000.
 
 ### Texture References
 The textures for this project was borrowed from these sites and projects. All credit to their creators.
@@ -84,6 +76,8 @@ http://www.shootersfm.com/?attachment_id=5
 http://stphq-stock.deviantart.com/art/WHITE-PAINTED-WOOD-01-295106430
 ##### Dotted Metal Surface Texture
 http://www.4freephotos.com/Holes_in_metal_surface-limage-5a8bf56998f04916e02827eb3b0b88b6.html#.Uw3XCnVdWlg
+#### Lamp Texture
+http://natsukilo.blogspot.se/2012/06/fypparticle-effect-texture.html
 
 =======================
 Assignment 3
