@@ -1,5 +1,6 @@
 package assignment4;
  
+import java.util.ArrayList;
 import java.util.UUID;
 
 import com.jme3.app.SimpleApplication;
@@ -63,7 +64,6 @@ public class Main extends SimpleApplication implements ActionListener {
     private Vector3f last_player_camera_direction;
     //private Vector3f last_player_camera_location;
     private Vector3f last_hal_camera_direction = new Vector3f(15f,  0f, 0f);
-    
     
     //private Vector3f last_position;
     private Vector3f last_scale;
@@ -237,15 +237,11 @@ public class Main extends SimpleApplication implements ActionListener {
 		inputManager.addListener(this, "Pick");
 		
 		inputManager.addListener(this, "Switch");
-		
-		//TODO: DOES NOT WORK
-		// Disabling the mouse wheel scroll zoom
-		inputManager.deleteMapping("FLYCAM_ZoomIn");
-		inputManager.deleteMapping("FLYCAM_ZoomOut");
 	}
 	
 	@Override
 	public void simpleUpdate(float tpf) {
+		
 		// Setting the camera
 		camera_direction.set(cam.getDirection()).multLocal(0.6f);
 		camera_left.set(cam.getLeft()).multLocal(0.4f);
@@ -272,14 +268,11 @@ public class Main extends SimpleApplication implements ActionListener {
 			cam.setLocation(new Vector3f(-97f, 26.5f, 0));
 			
 			//TODO: Limit camera rotation
-			
-			
 			// ALMOST working, but not really
 			/*if (cam.getUp().y < 0) {
 				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
 			} 
 			 */
-			
 			
 			// More like it, but not really. 
 			/*if (cam.getDirection().y > FastMath.QUARTER_PI || cam.getDirection().y < -FastMath.QUARTER_PI) { 
@@ -310,7 +303,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 	// Actions performed when button is pressed
 	public void onAction(String key_binding, boolean is_pressed, float tpf) {
-		if (key_binding.equals("Switch")) {		
+		if (key_binding.equals("Switch") && selected_object == null) {		
 			if (is_pressed == true) {
 				if (camera_position == 0) {
 					// Switching to HAL9000 mode
@@ -330,6 +323,13 @@ public class Main extends SimpleApplication implements ActionListener {
 					camera_position = 0;					
 				}
 			}
+		} else if (key_binding.equals("Switch") && selected_object != null) {
+			guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+			BitmapText text = new BitmapText(guiFont, false);
+			text.setSize(guiFont.getCharSet().getRenderedSize()*2);
+			text.setText("Put down the item!");        
+			text.setLocalTranslation(settings.getWidth()/1.5f - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/2 + text.getLineHeight()/6, 0);
+			announcer.attachChild(text);	
 		} else if (camera_position == 0) {
 			if (key_binding.equals("Forward")) {
 					forward = is_pressed;
@@ -396,20 +396,26 @@ public class Main extends SimpleApplication implements ActionListener {
 						if (collisions.size() > 0) {
 							CollisionResult closest = collisions.getClosestCollision();
 							Spatial spatial = closest.getGeometry();
-							last_scale = spatial.getLocalScale().clone();
-							//last_position = spatial.getLocalTranslation().clone();
 							
-							last_physical = spatial.getControl(RigidBodyControl.class);
-							bulletAppState.getPhysicsSpace().remove(last_physical);
-							spatial.removeControl(RigidBodyControl.class);
-							
-							manipulatables.detachChild(spatial);
-							inventory.attachChild(spatial);
-							
-							spatial.setLocalScale(150f);
-							spatial.setLocalTranslation(settings.getWidth()/2, settings.getHeight()/2, 0);	
-							
-							selected_object = spatial;
+							if (spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 25f) {
+								last_scale = spatial.getLocalScale().clone();
+								//last_position = spatial.getLocalTranslation().clone();
+								
+								last_physical = spatial.getControl(RigidBodyControl.class);
+								bulletAppState.getPhysicsSpace().remove(last_physical);
+								spatial.removeControl(RigidBodyControl.class);
+								
+								manipulatables.detachChild(spatial);
+								inventory.attachChild(spatial);
+								
+								spatial.setLocalScale(150f);
+								spatial.setLocalTranslation(settings.getWidth()/2, settings.getHeight()/2, 0);	
+								
+								selected_object = spatial;
+				
+							} else {
+								return;
+							}
 						}  
 					}
 				}		
@@ -417,15 +423,16 @@ public class Main extends SimpleApplication implements ActionListener {
 		} else if (camera_position == 1) {
 			// What should HAL900 be able to do?
 			// Just look pretty?
+			// Print quote?
 			
-			
-			
-			
-			
-			
-			
-			
-			
+			if (key_binding.equals("Use")) {
+				if (is_pressed == true) {
+					/*int min = 0;
+					int max = hal_quotes.size();
+					
+					int random = min + (int)(Math.random() * ((max - min) + 1));*/
+				}
+			}		
 		} 
 	}
 	
@@ -522,7 +529,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		TextureKey lamp_key = new TextureKey("glow.jpg");
 		lamp_key.setGenerateMips(true);
 		Texture lamp_texture = assetManager.loadTexture(lamp_key);
-		//lamp_texture.setWrap(WrapMode.Repeat);
 		lamp_material.setTexture("DiffuseMap", lamp_texture);
 	
 		hal9000_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");

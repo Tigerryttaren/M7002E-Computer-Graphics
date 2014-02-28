@@ -7,10 +7,9 @@ ToDo List
 =======================
 #### Important
 
-##### Disable the Fricking Camera Scrolling
-##### Adding Limited Pickup Distance
-##### Shadows for Multiple Light Sources
 ##### Limit Camera Panning in Other Point of View
+
+
 
 #### Not-So-Important
 
@@ -18,6 +17,12 @@ ToDo List
 ##### Adding the Enlarger
 ##### Adding the Shrinker
 
+
+
+#### If-Time-Allows
+
+##### Shadows for Multiple Light Sources
+##### Disable the Fricking Camera Scrolling
 
 
 
@@ -32,6 +37,8 @@ The controls and the general player concept was inspired from the **HelloCollisi
 #### Boundary-Penetrating Rod-Like Objects
 When an object is thrown upwards, it might penetrate the floor when falling down. Possibly just make the floow thicker or "denser", somehow? Changing bulletAppState to update more often? Refresh times on collision, increase them?
 
+#### Vision-Distorting Wheel-Zoom Effect
+By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation. Not really sure how to turn it off, efficiently.
 
 ### Required Features Implemented
 ##### Supports Egocentric Locomotion
