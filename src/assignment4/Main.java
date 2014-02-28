@@ -42,6 +42,12 @@ import com.jme3.ui.Picture;
 @SuppressWarnings("deprecation")
 public class Main extends SimpleApplication implements ActionListener {
 	
+	/*************************************
+	 * 
+	 * Constants and Globals
+	 * 
+	 *************************************/
+	
 	private CharacterControl player;
 	private Vector3f camera_direction = new Vector3f();
 	private Vector3f camera_left = new Vector3f();
@@ -62,10 +68,8 @@ public class Main extends SimpleApplication implements ActionListener {
     
     private int camera_position = 0;
     private Vector3f last_player_camera_direction;
-    //private Vector3f last_player_camera_location;
     private Vector3f last_hal_camera_direction = new Vector3f(15f,  0f, 0f);
-    
-    //private Vector3f last_position;
+
     private Vector3f last_scale;
     private RigidBodyControl last_physical;
 	
@@ -123,6 +127,13 @@ public class Main extends SimpleApplication implements ActionListener {
 		destroyer.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
 	}
 	
+	
+	/*************************************
+	 * 
+	 * Main Method, Init, and Update 
+	 * 
+	 *************************************/
+	
 	public static void main(String args[]) {
 		Main app = new Main();
 		app.start();
@@ -155,7 +166,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		rootNode.attachChild(manipulatables);	
 		
-		// Initializing the world and all control and so forth and so on forever and forever
+		// Initializing the world and everything
 		initKeys();
 		initMaterials();
 		initGround();
@@ -173,72 +184,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		initCreator();
 		initDestroyer();		
 	}
-	
-	public void initLight() {
-		// Adding a light to the HUD
-		DirectionalLight hud_light = new DirectionalLight();
-		hud_light.setDirection(new Vector3f(0, 0, -1.0f));
-		guiNode.addLight(hud_light);
 		
-		// Adding a light from the ceiling
-		PointLight light_ceiling = new PointLight();
-		light_ceiling.setColor(ColorRGBA.White);
-		light_ceiling.setRadius(600f);
-		light_ceiling.setPosition(new Vector3f(0, 50, 0));
-		rootNode.addLight(light_ceiling);
-		
-		// Adding a point light from HAL
-		PointLight light_hal = new PointLight();
-		light_hal.setColor(ColorRGBA.White);
-		light_hal.setRadius(6000f);
-		light_hal.setPosition(new Vector3f(-95, 20, 0));
-		rootNode.addLight(light_hal);
-		
-		
-		// Shadows
-		//TODO: Fix so can have multiple light sources with shadows
-		final int SHADOWMAP_SIZE = 512;
-		
-		PointLightShadowRenderer plsr_ceiling = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
-		plsr_ceiling.setLight(light_ceiling);
-        viewPort.addProcessor(plsr_ceiling);
-        
-        PointLightShadowRenderer plsr_hal = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
-        plsr_hal.setLight(light_hal);
-        viewPort.addProcessor(plsr_hal);
-		
-	}
-
-	// Initialized the key mapping to controls work
-	private void initKeys() {
-		// For moving the player
-		inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
-		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
-		inputManager.addMapping("Backward", new KeyTrigger(KeyInput.KEY_S));
-		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
-		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
-	    
-		inputManager.addMapping("Use", new KeyTrigger(KeyInput.KEY_E));
-		inputManager.addMapping("Throw", new KeyTrigger(KeyInput.KEY_T));
-		inputManager.addMapping("Pick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-		inputManager.addMapping("Drop", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-		
-		inputManager.addMapping("Switch", new KeyTrigger(KeyInput.KEY_TAB));
-	   
-		inputManager.addListener(this, "Forward");
-		inputManager.addListener(this, "Left");
-		inputManager.addListener(this, "Backward");
-		inputManager.addListener(this, "Right"); 
-		inputManager.addListener(this, "Jump");
-		
-		inputManager.addListener(this, "Throw");
-		inputManager.addListener(this, "Use");
-		inputManager.addListener(this, "Drop");
-		inputManager.addListener(this, "Pick");
-		
-		inputManager.addListener(this, "Switch");
-	}
-	
 	@Override
 	public void simpleUpdate(float tpf) {
 		
@@ -300,6 +246,15 @@ public class Main extends SimpleApplication implements ActionListener {
 			announcer.attachChild(text);
 		}
 	}
+	
+	
+	
+	
+	/*************************************
+	 * 
+	 * (Monolithic) Action Listener Method
+	 * 
+	 *************************************/
 	
 	// Actions performed when button is pressed
 	public void onAction(String key_binding, boolean is_pressed, float tpf) {
@@ -421,6 +376,7 @@ public class Main extends SimpleApplication implements ActionListener {
 				}		
 			} 
 		} else if (camera_position == 1) {
+			//TODO: Add something HAL9000 can do?
 			// What should HAL900 be able to do?
 			// Just look pretty?
 			// Print quote?
@@ -435,6 +391,14 @@ public class Main extends SimpleApplication implements ActionListener {
 			}		
 		} 
 	}
+	
+	
+	
+	/*************************************
+	 * 
+	 * User Operation Methods
+	 * 
+	 *************************************/
 	
 	public void operationDrop(){
 		Spatial spatial = inventory.getChild(0);
@@ -501,6 +465,78 @@ public class Main extends SimpleApplication implements ActionListener {
 			manipulatables.detachChild(spatial);
 		}  
 	}
+	
+	
+	
+	/*************************************
+	 * 
+	 * Initialization Methods
+	 * 
+	 *************************************/
+	
+	// Initialized the key mapping to controls work
+	private void initKeys() {
+		// For moving the player
+		inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
+		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
+		inputManager.addMapping("Backward", new KeyTrigger(KeyInput.KEY_S));
+		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
+		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
+	    
+		inputManager.addMapping("Use", new KeyTrigger(KeyInput.KEY_E));
+		inputManager.addMapping("Throw", new KeyTrigger(KeyInput.KEY_T));
+		inputManager.addMapping("Pick", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+		inputManager.addMapping("Drop", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+		
+		inputManager.addMapping("Switch", new KeyTrigger(KeyInput.KEY_TAB));
+	   
+		inputManager.addListener(this, "Forward");
+		inputManager.addListener(this, "Left");
+		inputManager.addListener(this, "Backward");
+		inputManager.addListener(this, "Right"); 
+		inputManager.addListener(this, "Jump");
+		
+		inputManager.addListener(this, "Throw");
+		inputManager.addListener(this, "Use");
+		inputManager.addListener(this, "Drop");
+		inputManager.addListener(this, "Pick");
+		
+		inputManager.addListener(this, "Switch");
+	}
+	
+	public void initLight() {
+		// Adding a light to the HUD
+		DirectionalLight hud_light = new DirectionalLight();
+		hud_light.setDirection(new Vector3f(0, 0, -1.0f));
+		guiNode.addLight(hud_light);
+		
+		// Adding a light from the ceiling
+		PointLight light_ceiling = new PointLight();
+		light_ceiling.setColor(ColorRGBA.White);
+		light_ceiling.setRadius(600f);
+		light_ceiling.setPosition(new Vector3f(0, 50, 0));
+		rootNode.addLight(light_ceiling);
+		
+		// Adding a point light from HAL
+		PointLight light_hal = new PointLight();
+		light_hal.setColor(ColorRGBA.White);
+		light_hal.setRadius(6000f);
+		light_hal.setPosition(new Vector3f(-95, 20, 0));
+		rootNode.addLight(light_hal);
+		
+		
+		// Shadows
+		//TODO: Fix so can have multiple light sources with shadows
+		final int SHADOWMAP_SIZE = 512;
+		
+		PointLightShadowRenderer plsr_ceiling = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
+		plsr_ceiling.setLight(light_ceiling);
+        viewPort.addProcessor(plsr_ceiling);
+        
+        PointLightShadowRenderer plsr_hal = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
+        plsr_hal.setLight(light_hal);
+        viewPort.addProcessor(plsr_hal);	
+	}
  
 	// Materials used in the scene
 	public void initMaterials() { 
@@ -547,11 +583,27 @@ public class Main extends SimpleApplication implements ActionListener {
 	// Make the player
 	public void initPlayer() {
 		player = new CharacterControl(new CapsuleCollisionShape(1.5f, 6f), 0.05f);
+		
+		//TODO: For adding some kind of model to the player
+		/*playerModel = (Node) assetManager.loadModel("Models/TestChar.mesh.j3o");
+		playerModel.setLocalScale(0.5f);
+		playerModel.setLocalTranslation(new Vector3f(0f,-1.0f, 0f));
+		playerModel.addControl(player);*/
+		
+		
+		
+		
 		player.setJumpSpeed(20); 	
 		player.setFallSpeed(30); 	
 		player.setGravity(80); 		
 		player.setPhysicsLocation(new Vector3f(0, 10, 0));
 		bulletAppState.getPhysicsSpace().add(player);
+		
+		
+		
+		
+		
+		
 	}
  
 	// Make solid ground and add it to scene

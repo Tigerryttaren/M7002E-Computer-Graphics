@@ -9,8 +9,6 @@ ToDo List
 
 ##### Limit Camera Panning in Other Point of View
 
-
-
 #### Not-So-Important
 
 ##### Adding Some Player Model
@@ -22,7 +20,7 @@ ToDo List
 #### If-Time-Allows
 
 ##### Shadows for Multiple Light Sources
-##### Disable the Fricking Camera Scrolling
+##### Disable Camera Scrolling/Zoom
 
 
 
@@ -72,7 +70,11 @@ These small red boxes containing extremely hazardous biological waste can be tos
 #### Switching Point of View
 Use the **TAB** key to switch between the point of view of the player and the point of view of HAL9000.
 
-### Texture References
+### Resources
+#### Code Examples
+##### jMonkey Tutorials
+http://hub.jmonkeyengine.org/wiki/doku.php/jme3#tutorials_for_beginners
+#### Texture References
 The textures for this project was borrowed from these sites and projects. All credit to their creators.
 ##### Black Tile Texture
 http://www.moddb.com/mods/h2f/images/the-even-newer-panel-texture1
