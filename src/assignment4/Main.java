@@ -524,17 +524,18 @@ public class Main extends SimpleApplication implements ActionListener {
 		light_hal.setPosition(new Vector3f(-95, 20, 0));
 		rootNode.addLight(light_hal);
 		
-		
 		// Shadows
-		//TODO: Fix so can have multiple light sources with shadows
 		final int SHADOWMAP_SIZE = 512;
 		
 		PointLightShadowRenderer plsr_ceiling = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
 		plsr_ceiling.setLight(light_ceiling);
-        viewPort.addProcessor(plsr_ceiling);
+        
+        plsr_ceiling.setFlushQueues(false);
         
         PointLightShadowRenderer plsr_hal = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
         plsr_hal.setLight(light_hal);
+        
+        viewPort.addProcessor(plsr_ceiling);
         viewPort.addProcessor(plsr_hal);	
 	}
  

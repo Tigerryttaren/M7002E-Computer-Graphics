@@ -9,6 +9,9 @@ ToDo List
 
 ##### Limit Camera Panning in Other Point of View
 
+
+
+
 #### Not-So-Important
 
 ##### Adding Some Player Model
@@ -19,7 +22,6 @@ ToDo List
 
 #### If-Time-Allows
 
-##### Shadows for Multiple Light Sources
 ##### Disable Camera Scrolling/Zoom
 
 
@@ -49,7 +51,7 @@ Direct selection is implemented. The player has the ability to aim at an object 
 THe user can switch camera view between the player character and the evil red surveilance eye a la HAL9000.
 
 ##### Look Somewhat Natural
-Utilizing pretty textures from the internet and rudimentary physics, the scene looks and feels at least somewhat natural. Also, acceptably realistic shadows are used.
+Utilizing pretty textures from the internet and rudimentary physics, the scene looks and feels at least somewhat natural. Also, acceptably realistic shadows are used. 
 
 ### Instructions
 #### Moving the Player
