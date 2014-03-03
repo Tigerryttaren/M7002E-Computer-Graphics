@@ -65,6 +65,7 @@ public class Main extends SimpleApplication implements ActionListener {
     private Node announcer;
     
     private Picture hal_mode;
+    private boolean hal_text_on = false;
     
     private int camera_position = 0;
     private Vector3f last_player_camera_direction;
@@ -214,11 +215,55 @@ public class Main extends SimpleApplication implements ActionListener {
 			cam.setLocation(new Vector3f(-97f, 26.5f, 0));
 			
 			//TODO: Limit camera rotation
+			
 			// ALMOST working, but not really
 			/*if (cam.getUp().y < 0) {
 				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
-			} 
-			 */
+			} */
+			
+			/*if (cam.getUp().y < FastMath.QUARTER_PI) {
+				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
+			}*/
+			
+			/*Vector3f thing = new Vector3f(15f,  0f, 0f);
+			
+			if (thing.angleBetween(cam.getDirection()) > FastMath.QUARTER_PI) {
+				cam.lookAtDirection(new Vector3f(cam.getDirection().x, cam.getDirection().y, cam.getDirection().z), new Vector3f(0, 1, 0));
+			}*/
+			
+			
+			
+			
+			/*if (cam.getUp().y < 0) {
+				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
+			}
+			
+			if (cam.getLeft().z > 0) {
+				cam.lookAtDirection(new Vector3f(0, 0, cam.getDirection().z), new Vector3f(cam.getUp().x, cam.getUp().y, 0));
+			}*/
+			
+			
+			/*if (cam.getLeft().z > 0 || cam.getUp().y < 0) {
+				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, cam.getDirection().z), new Vector3f(cam.getUp().x, 0,0));
+			}*/
+			
+			/*if (cam.getLeft().z > 0 || cam.getUp().y < 0) {
+				//cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, cam.getDirection().z), new Vector3f(0, cam.getUp().y, cam.getUp().z));
+				cam.lookAtDirection(new Vector3f(0, 1, 1), new Vector3f(0, cam.getUp().y, cam.getUp().z));
+			}*/
+			
+			/*if (cam.getLeft().z > 0 || cam.getUp().y < 0) {
+				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, cam.getDirection().z), new Vector3f(cam.getUp().x, cam.getUp().y, 0));
+			}*/
+			
+			
+		
+			
+			
+			
+			
+			
+			 
 			
 			// More like it, but not really. 
 			/*if (cam.getDirection().y > FastMath.QUARTER_PI || cam.getDirection().y < -FastMath.QUARTER_PI) { 
@@ -375,18 +420,22 @@ public class Main extends SimpleApplication implements ActionListener {
 					}
 				}		
 			} 
-		} else if (camera_position == 1) {
-			//TODO: Add something HAL9000 can do?
-			// What should HAL900 be able to do?
-			// Just look pretty?
-			// Print quote?
-			
+		} else if (camera_position == 1) {			
 			if (key_binding.equals("Use")) {
 				if (is_pressed == true) {
-					/*int min = 0;
-					int max = hal_quotes.size();
+					guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+					BitmapText text = new BitmapText(guiFont, false);
+					text.setSize(guiFont.getCharSet().getRenderedSize()*2);
+					text.setText("I'm sorry, Dave. I'm afraid I can't do that.");        
+					text.setLocalTranslation(settings.getWidth()/4 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/1.7f + text.getLineHeight()/6, 0);
 					
-					int random = min + (int)(Math.random() * ((max - min) + 1));*/
+					if (hal_text_on == true) {
+						announcer.attachChild(text);
+						hal_text_on = false;
+					} else if (hal_text_on == false) {
+						announcer.detachAllChildren();
+						hal_text_on = true;
+					}
 				}
 			}		
 		} 
@@ -586,11 +635,10 @@ public class Main extends SimpleApplication implements ActionListener {
 		player = new CharacterControl(new CapsuleCollisionShape(1.5f, 6f), 0.05f);
 		
 		//TODO: For adding some kind of model to the player
-		/*playerModel = (Node) assetManager.loadModel("Models/TestChar.mesh.j3o");
-		playerModel.setLocalScale(0.5f);
-		playerModel.setLocalTranslation(new Vector3f(0f,-1.0f, 0f));
-		playerModel.addControl(player);*/
-		
+		//playerModel = (Node) assetManager.loadModel("Models/TestChar.mesh.j3o");
+		//playerModel.setLocalScale(0.5f);
+		//playerModel.setLocalTranslation(new Vector3f(0f,-1.0f, 0f));
+		//playerModel.addControl(player);
 		
 		
 		
