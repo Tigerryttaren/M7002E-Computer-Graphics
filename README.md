@@ -9,12 +9,11 @@ ToDo List
 
 #### Not-So-Important
 
-##### Adding the Enlarger
-##### Adding the Shrinker
+##### Adding the Baller?
 
 
 
-#### If-Time-Allows
+#### Hardly-At-All-Important
 
 ##### Disable Camera Scrolling/Zoom
 

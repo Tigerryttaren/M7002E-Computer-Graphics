@@ -99,6 +99,8 @@ public class Main extends SimpleApplication implements ActionListener {
 	private static final Cylinder creator;
 	private static final Cylinder destroyer;
 	
+	private static final Cylinder rod;
+	
 	private Spatial selected_object;
 	
 	static {
@@ -125,6 +127,9 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		destroyer = new Cylinder(10, 50, 0.1f, 3f, true);
 		destroyer.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
+		
+		rod = new Cylinder(10, 50, 0.1f, 3f, true);
+		rod.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
 	}
 	
 	
@@ -181,8 +186,9 @@ public class Main extends SimpleApplication implements ActionListener {
 		initPlayer();
 		initCrossHair();
 		initHALMode();
-		initCreator();
-		initDestroyer();		
+		//initCreator();
+		initRods();
+		//initDestroyer();		
 	}
 		
 	@Override
@@ -227,10 +233,14 @@ public class Main extends SimpleApplication implements ActionListener {
 			BitmapText text = new BitmapText(guiFont, false);
 			text.setSize(guiFont.getCharSet().getRenderedSize()*2);
 			
-			if (selected_object.getName().equals("Destroyer")) {
-				text.setText("Wielding the Destroyer!");        
-			} else if (selected_object.getName().equals("Creator")) {
-				text.setText("Wielding the Creator!");      
+			if (selected_object.getName().equals("Creator")) {
+				text.setText("Wielding the Creator!");        
+			} else if (selected_object.getName().equals("Destroyer")) {
+				text.setText("Wielding the Destroyer!");      
+			} else if (selected_object.getName().equals("Enlarger")) {
+				text.setText("Wielding the Enlarger!");      
+			} else if (selected_object.getName().equals("Shrinker")) {
+				text.setText("Wielding the Shrinker!");      
 			} else {
 				text.setText("");
 			}
@@ -318,9 +328,13 @@ public class Main extends SimpleApplication implements ActionListener {
 					// Check that you are holding the some item, else do not allow action
 					if (inventory.getChildren().isEmpty() == false) {
 						if (inventory.getChild(0).getName().equals("Creator") == true) {
-							operationCreate(tpf);
+							operationCreate();
 						} else if (inventory.getChild(0).getName().equals("Destroyer") == true) {
-							operationDestroy(tpf);
+							operationDestroy();
+						} else if (inventory.getChild(0).getName().equals("Enlarger") == true) {
+							operationEnlarge();
+						} else if (inventory.getChild(0).getName().equals("Shrinker") == true) {
+							operationShrink();
 						} else {
 							return;
 						}
@@ -356,7 +370,7 @@ public class Main extends SimpleApplication implements ActionListener {
 								inventory.attachChild(spatial);
 								
 								// Rotating the rods
-								if (inventory.getChild(0).getName().equals("Destroyer") || inventory.getChild(0).getName().equals("Creator")) {
+								if (inventory.getChild(0).getName().equals("Creator") || inventory.getChild(0).getName().equals("Destroyer") || inventory.getChild(0).getName().equals("Enlarger") || inventory.getChild(0).getName().equals("Shrinker")) {
 									
 									Quaternion rotate_x = new Quaternion(); 
 									rotate_x.fromAngleAxis(FastMath.PI/2, new Vector3f(1, 0, 0));  
@@ -448,7 +462,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		spatial.getControl(RigidBodyControl.class).applyImpulse(direction.mult(500), new Vector3f(0, 0, 0));
 	}
 	
-	public void operationCreate(float tpf) {
+	public void operationCreate() {
 		Vector3f location = cam.getLocation();
 		Vector3f direction = cam.getDirection();
 		
@@ -466,7 +480,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		manipulatables.attachChild(makeBioBox(trans_x, trans_y, trans_z, rad, rot_x, rot_y, rot_z, scale, mass, name));
 	}
 	
-	public void operationDestroy(float tpf) {
+	public void operationDestroy() {
 		CollisionResults collisions = new CollisionResults();
 		Ray ray = new Ray(cam.getLocation(), cam.getDirection());
 		manipulatables.collideWith(ray, collisions);
@@ -478,6 +492,66 @@ public class Main extends SimpleApplication implements ActionListener {
 			spatial.removeControl(RigidBodyControl.class);
 			manipulatables.detachChild(spatial);
 		}  
+	}
+	
+	public void operationEnlarge() {
+		CollisionResults collisions = new CollisionResults();
+		Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+		manipulatables.collideWith(ray, collisions);
+		
+		if (collisions.size() > 0) {
+			CollisionResult closest = collisions.getClosestCollision();
+			Spatial spatial = closest.getGeometry();
+			
+			bulletAppState.getPhysicsSpace().remove(spatial.getControl(RigidBodyControl.class));
+			spatial.removeControl(RigidBodyControl.class);
+			manipulatables.detachChild(spatial);
+			
+			float current_scale = spatial.getLocalScale().x; // Whichever really
+			
+			float trans_x = closest.getGeometry().getWorldTranslation().x; 
+			float trans_y = closest.getGeometry().getWorldTranslation().y; 
+			float trans_z = closest.getGeometry().getWorldTranslation().z; 
+			float rad = 2;
+			float rot_x = 0;
+			float rot_y = 0;
+			float rot_z = 0;
+			float scale = current_scale * 1.5f;
+			float mass = 9;
+			String name = UUID.randomUUID().toString();
+			
+			manipulatables.attachChild(makeBioBox(trans_x, trans_y, trans_z, rad, rot_x, rot_y, rot_z, scale, mass, name));
+		}  
+	}
+	
+	public void operationShrink() {
+		CollisionResults collisions = new CollisionResults();
+		Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+		manipulatables.collideWith(ray, collisions);
+		
+		if (collisions.size() > 0) {
+			CollisionResult closest = collisions.getClosestCollision();
+			Spatial spatial = closest.getGeometry();
+			
+			bulletAppState.getPhysicsSpace().remove(spatial.getControl(RigidBodyControl.class));
+			spatial.removeControl(RigidBodyControl.class);
+			manipulatables.detachChild(spatial);
+			
+			float current_scale = spatial.getLocalScale().x; // Whichever really
+			
+			float trans_x = closest.getGeometry().getWorldTranslation().x; 
+			float trans_y = closest.getGeometry().getWorldTranslation().y; 
+			float trans_z = closest.getGeometry().getWorldTranslation().z; 
+			float rad = 2;
+			float rot_x = 0;
+			float rot_y = 0;
+			float rot_z = 0;
+			float scale = current_scale * 0.75f;
+			float mass = 9;
+			String name = UUID.randomUUID().toString();
+			
+			manipulatables.attachChild(makeBioBox(trans_x, trans_y, trans_z, rad, rot_x, rot_y, rot_z, scale, mass, name));
+		}
 	}
 	
 	
@@ -630,6 +704,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 		// Creates the ground physical with a mass 0.0f
 		ground_physical = new RigidBodyControl(0.0f);
+		
 		ground_geometry.addControl(ground_physical);
 		bulletAppState.getPhysicsSpace().add(ground_physical);	
 		return ground_geometry;
@@ -733,7 +808,46 @@ public class Main extends SimpleApplication implements ActionListener {
 		return cube_geometry;
 	}
 	
-	public void initCreator() {
+	public void initRods () {
+		manipulatables.attachChild(makeRod("Creator", "rod_white.jpg", -50, 2, 5));
+		manipulatables.attachChild(makeRod("Destroyer", "rod_black.jpg", -50, 2, -5));
+		manipulatables.attachChild(makeRod("Enlarger", "rod_red.jpg", -40, 2, 5));
+		manipulatables.attachChild(makeRod("Shrinker", "rod_blue.jpg", -40, 2, -5));
+		
+	}
+	
+	private Geometry makeRod(String name, String texture_path, float trans_x, float trans_y, float trans_z) {
+		Geometry rod_geometry = new Geometry(name, rod);
+		rod_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
+		Material rod_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+		Texture rod_texture = assetManager.loadTexture(texture_path);
+		rod_material.setTexture("DiffuseMap", rod_texture);
+	    
+		//TODO: Remove
+		// Using a quaternion to save a rotation to be used on the wall
+		/*Quaternion rotate90 = new Quaternion(); 
+		rotate90.fromAngleAxis(FastMath.PI/2, new Vector3f(0, 0, 0));
+		rod_geometry.setLocalRotation(rotate90);*/
+	 
+		rod_geometry.setLocalScale(1f);
+		rod_geometry.setMaterial(rod_material);
+	    
+		// Adding a collision box to geometry
+		CollisionShape creator_shape = CollisionShapeFactory.createBoxShape(rod_geometry);
+		RigidBodyControl rod_physical = new RigidBodyControl(creator_shape, 10f);
+	    	    
+		rod_physical.setFriction(5f);
+		rod_geometry.addControl(rod_physical);
+		bulletAppState.getPhysicsSpace().add(rod_physical);
+		return rod_geometry;
+	}
+	
+	
+	
+	
+	
+	//TODO: Remove before handing in
+	/*public void initCreator() {
 		manipulatables.attachChild(makeCreator());
 	}
 	
@@ -741,7 +855,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		Geometry creator_geometry = new Geometry("Creator", creator);
 		creator_geometry.setLocalTranslation(new Vector3f(-50, 2, 5f));
 		Material creator_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-		Texture creator_texture = assetManager.loadTexture("rod_green.jpg");
+		Texture creator_texture = assetManager.loadTexture("rod_white.jpg");
 		creator_material.setTexture("DiffuseMap", creator_texture);
 	    
 		// Using a quaternion to save a rotation to be used on the wall
@@ -770,7 +884,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		Geometry destroyer_geometry = new Geometry("Destroyer", destroyer);
 		destroyer_geometry.setLocalTranslation(new Vector3f(-50, 2, -5f));
 		Material destroyer_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-		Texture destroyer_texture = assetManager.loadTexture("rod_red.jpg");
+		Texture destroyer_texture = assetManager.loadTexture("rod_black.jpg");
 		destroyer_material.setTexture("DiffuseMap", destroyer_texture);
 		
 		// Using a quaternion to save a rotation to be used on the wall
@@ -789,7 +903,15 @@ public class Main extends SimpleApplication implements ActionListener {
 		destroyer_geometry.addControl(destroyer_physical);
 		bulletAppState.getPhysicsSpace().add(destroyer_physical);
 		return destroyer_geometry;
-	}
+	}*/
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	// Making the BioBoxes
 	public void initBioBoxes() {
@@ -808,6 +930,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		Texture cube_texture = assetManager.loadTexture("biohazard.png");
 		cube_material.setTexture("DiffuseMap", cube_texture);
 		
+		//TODO: remove before handing in
 		//cube_material.setColor("Diffuse", ColorRGBA.White);
 		//cube_material.setColor("Specular", ColorRGBA.White);
 		//cube_material.setBoolean("UseMaterialColors", true);
