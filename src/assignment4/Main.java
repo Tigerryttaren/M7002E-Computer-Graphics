@@ -215,7 +215,6 @@ public class Main extends SimpleApplication implements ActionListener {
 			cam.setLocation(new Vector3f(-97f, 26.5f, 0));
 			
 			//TODO: Limit camera rotation
-			
 			// ALMOST working, but not really
 			/*if (cam.getUp().y < 0) {
 				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
