@@ -9,13 +9,11 @@ ToDo List
 
 #### Not-So-Important
 
-##### Adding the Baller?
-
-
-
 #### Hardly-At-All-Important
 
-##### Disable Camera Scrolling/Zoom
+* [ ] Disable Camera Scrolling/Zoom
+* [ ] Herp
+* [ ] Derp
 
 
 
@@ -26,15 +24,17 @@ Assignment 4
 ### "Disclaimer"
 The controls and the general player concept was inspired from the **HelloCollisions.java** example, and crosshairs were taken pretty straight off from **HelloPhysics.java**. The **HelloPicking.java** example was used for learning how to do picking.
 
+This hilariously monolithic file could and propbably should be split up in several smaller files for readability, but so far, it has not turn out that way ;-)
+
 ### "Features" aka Bugs or Unfinished
 #### Boundary-Penetrating Rod-Like Objects
-**Minor.** When an object is thrown upwards, it might penetrate the floor when falling down.
+When an object is thrown upwards, it might penetrate the floor when falling down.
 
 #### Vision-Distorting Wheel-Zoom Effect
-**Minor.** By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation. Not really sure how to turn it off, efficiently.
+By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation, and no simple and efficient solution was found.
 
 #### Border-Zone Cam-Vibrations
-**Minor.** When in HAL9000-mode and you pan the camera to the edge, the camera shakes a bit due to how i implemented the limited camera panning. Very minor, but still a bit on an annoyance.
+When in HAL9000-mode and you pan the camera to the edge, the camera shakes a bit due to how I implemented the limited camera panning. Very minor, but still a bit on an annoyance.
 
 ### Required Features Implemented
 ##### Supports Egocentric Locomotion

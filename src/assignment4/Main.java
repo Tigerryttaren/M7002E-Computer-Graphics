@@ -31,6 +31,7 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.LightControl;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.shadow.PointLightShadowRenderer;
@@ -186,9 +187,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		initPlayer();
 		initCrossHair();
 		initHALMode();
-		//initCreator();
-		initRods();
-		//initDestroyer();		
+		initRods();	
 	}
 		
 	@Override
@@ -360,7 +359,6 @@ public class Main extends SimpleApplication implements ActionListener {
 							
 							if (spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 25f) {
 								last_scale = spatial.getLocalScale().clone();
-								//last_position = spatial.getLocalTranslation().clone();
 								
 								last_physical = spatial.getControl(RigidBodyControl.class);
 								bulletAppState.getPhysicsSpace().remove(last_physical);
@@ -369,8 +367,11 @@ public class Main extends SimpleApplication implements ActionListener {
 								manipulatables.detachChild(spatial);
 								inventory.attachChild(spatial);
 								
-								// Rotating the rods
-								if (inventory.getChild(0).getName().equals("Creator") || inventory.getChild(0).getName().equals("Destroyer") || inventory.getChild(0).getName().equals("Enlarger") || inventory.getChild(0).getName().equals("Shrinker")) {
+								// Rotating the rods for correct holding
+								if (inventory.getChild(0).getName().equals("Creator") 
+										|| inventory.getChild(0).getName().equals("Destroyer") 
+										|| inventory.getChild(0).getName().equals("Enlarger") 
+										|| inventory.getChild(0).getName().equals("Shrinker")) {
 									
 									Quaternion rotate_x = new Quaternion(); 
 									rotate_x.fromAngleAxis(FastMath.PI/2, new Vector3f(1, 0, 0));  
@@ -387,7 +388,6 @@ public class Main extends SimpleApplication implements ActionListener {
 								} else {
 									spatial.setLocalScale(150f);
 									spatial.setLocalTranslation(settings.getWidth()/2, settings.getHeight()/2, 0);	
-									
 								}
 								
 								selected_object = spatial;
@@ -516,7 +516,7 @@ public class Main extends SimpleApplication implements ActionListener {
 			float rot_x = 0;
 			float rot_y = 0;
 			float rot_z = 0;
-			float scale = current_scale * 1.5f;
+			float scale = current_scale * 1.1f;
 			float mass = 9;
 			String name = UUID.randomUUID().toString();
 			
@@ -546,7 +546,7 @@ public class Main extends SimpleApplication implements ActionListener {
 			float rot_x = 0;
 			float rot_y = 0;
 			float rot_z = 0;
-			float scale = current_scale * 0.75f;
+			float scale = current_scale * 0.9f;
 			float mass = 9;
 			String name = UUID.randomUUID().toString();
 			
@@ -812,8 +812,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		manipulatables.attachChild(makeRod("Creator", "rod_white.jpg", -50, 2, 5));
 		manipulatables.attachChild(makeRod("Destroyer", "rod_black.jpg", -50, 2, -5));
 		manipulatables.attachChild(makeRod("Enlarger", "rod_red.jpg", -40, 2, 5));
-		manipulatables.attachChild(makeRod("Shrinker", "rod_blue.jpg", -40, 2, -5));
-		
+		manipulatables.attachChild(makeRod("Shrinker", "rod_blue.jpg", -40, 2, -5));		
 	}
 	
 	private Geometry makeRod(String name, String texture_path, float trans_x, float trans_y, float trans_z) {
@@ -823,12 +822,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		Texture rod_texture = assetManager.loadTexture(texture_path);
 		rod_material.setTexture("DiffuseMap", rod_texture);
 	    
-		//TODO: Remove
-		// Using a quaternion to save a rotation to be used on the wall
-		/*Quaternion rotate90 = new Quaternion(); 
-		rotate90.fromAngleAxis(FastMath.PI/2, new Vector3f(0, 0, 0));
-		rod_geometry.setLocalRotation(rotate90);*/
-	 
 		rod_geometry.setLocalScale(1f);
 		rod_geometry.setMaterial(rod_material);
 	    
@@ -841,77 +834,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		bulletAppState.getPhysicsSpace().add(rod_physical);
 		return rod_geometry;
 	}
-	
-	
-	
-	
-	
-	//TODO: Remove before handing in
-	/*public void initCreator() {
-		manipulatables.attachChild(makeCreator());
-	}
-	
-	private Geometry makeCreator() {
-		Geometry creator_geometry = new Geometry("Creator", creator);
-		creator_geometry.setLocalTranslation(new Vector3f(-50, 2, 5f));
-		Material creator_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-		Texture creator_texture = assetManager.loadTexture("rod_white.jpg");
-		creator_material.setTexture("DiffuseMap", creator_texture);
-	    
-		// Using a quaternion to save a rotation to be used on the wall
-		Quaternion rotate90 = new Quaternion(); 
-		rotate90.fromAngleAxis(FastMath.PI/2, new Vector3f(0, 0, 0));
-		creator_geometry.setLocalRotation(rotate90);
-	 
-		creator_geometry.setLocalScale(1f);
-		creator_geometry.setMaterial(creator_material);
-	    
-		// Adding a collision box to geometry
-		CollisionShape creator_shape = CollisionShapeFactory.createBoxShape(creator_geometry);
-		RigidBodyControl creator_physical = new RigidBodyControl(creator_shape, 10f);
-	    	    
-		creator_physical.setFriction(5f);
-		creator_geometry.addControl(creator_physical);
-		bulletAppState.getPhysicsSpace().add(creator_physical);
-		return creator_geometry;
-	}
-	
-	public void initDestroyer() {
-		manipulatables.attachChild(makeDestroyer());
-	}
-	
-	private Geometry makeDestroyer() {
-		Geometry destroyer_geometry = new Geometry("Destroyer", destroyer);
-		destroyer_geometry.setLocalTranslation(new Vector3f(-50, 2, -5f));
-		Material destroyer_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-		Texture destroyer_texture = assetManager.loadTexture("rod_black.jpg");
-		destroyer_material.setTexture("DiffuseMap", destroyer_texture);
-		
-		// Using a quaternion to save a rotation to be used on the wall
-		Quaternion rotate90 = new Quaternion(); 
-		rotate90.fromAngleAxis(FastMath.PI/2, new Vector3f(0, 0, 0));
-		destroyer_geometry.setLocalRotation(rotate90);
-	 
-		destroyer_geometry.setLocalScale(1f);
-		destroyer_geometry.setMaterial(destroyer_material);
-	    
-		// Adding a collision box to geometry
-		CollisionShape destroyer_shape = CollisionShapeFactory.createBoxShape(destroyer_geometry);
-		RigidBodyControl destroyer_physical = new RigidBodyControl(destroyer_shape, 10f);
-	    	    
-		destroyer_physical.setFriction(5f);
-		destroyer_geometry.addControl(destroyer_physical);
-		bulletAppState.getPhysicsSpace().add(destroyer_physical);
-		return destroyer_geometry;
-	}*/
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	// Making the BioBoxes
 	public void initBioBoxes() {
@@ -929,11 +851,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		Material cube_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		Texture cube_texture = assetManager.loadTexture("biohazard.png");
 		cube_material.setTexture("DiffuseMap", cube_texture);
-		
-		//TODO: remove before handing in
-		//cube_material.setColor("Diffuse", ColorRGBA.White);
-		//cube_material.setColor("Specular", ColorRGBA.White);
-		//cube_material.setBoolean("UseMaterialColors", true);
 		
 		// Using a quaternion to save a rotation to be used on the wall
 		Quaternion rotate90 = new Quaternion(); 
