@@ -7,10 +7,6 @@ ToDo List
 =======================
 #### Important
 
-##### Limit Camera Panning in Other Point of View
-
-Cats!!
-
 #### Not-So-Important
 
 ##### Adding Some Player Model
@@ -32,12 +28,15 @@ Assignment 4
 ### "Disclaimer"
 The controls and the general player concept was inspired from the **HelloCollisions.java** example, and crosshairs were taken pretty straight off from **HelloPhysics.java**. The **HelloPicking.java** example was used for learning how to do picking.
 
-### "Features" aka Bugs
+### "Features" aka Bugs or Unfinished
 #### Boundary-Penetrating Rod-Like Objects
 When an object is thrown upwards, it might penetrate the floor when falling down. Possibly just make the floow thicker or "denser", somehow? Changing bulletAppState to update more often? Refresh times on collision, increase them?
 
 #### Vision-Distorting Wheel-Zoom Effect
 By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation. Not really sure how to turn it off, efficiently.
+
+#### Border-Zone Cam-Vibrations
+When in HAL9000-mode and you pan the camera to the edge, the camera shakes a bit due to how i implemented the limited camera panning. Very minor, but still a bit on an annoyance.
 
 ### Required Features Implemented
 ##### Supports Egocentric Locomotion

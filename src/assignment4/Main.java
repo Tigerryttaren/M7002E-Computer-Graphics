@@ -1,6 +1,5 @@
 package assignment4;
  
-import java.util.ArrayList;
 import java.util.UUID;
 
 import com.jme3.app.SimpleApplication;
@@ -214,63 +213,12 @@ public class Main extends SimpleApplication implements ActionListener {
 		} else if (camera_position == 1) {
 			cam.setLocation(new Vector3f(-97f, 26.5f, 0));
 			
-			//TODO: Limit camera rotation
-			// ALMOST working, but not really
-			/*if (cam.getUp().y < 0) {
-				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
-			} */
+			// Limiting Camera Panning
+			Vector3f dir = new Vector3f(1f, 0f, 0f);
 			
-			/*if (cam.getUp().y < FastMath.QUARTER_PI) {
-				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
-			}*/
-			
-			/*Vector3f thing = new Vector3f(15f,  0f, 0f);
-			
-			if (thing.angleBetween(cam.getDirection()) > FastMath.QUARTER_PI) {
-				cam.lookAtDirection(new Vector3f(cam.getDirection().x, cam.getDirection().y, cam.getDirection().z), new Vector3f(0, 1, 0));
-			}*/
-			
-			
-			
-			
-			/*if (cam.getUp().y < 0) {
-				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getUp().x, 0, cam.getUp().z));
-			}
-			
-			if (cam.getLeft().z > 0) {
-				cam.lookAtDirection(new Vector3f(0, 0, cam.getDirection().z), new Vector3f(cam.getUp().x, cam.getUp().y, 0));
-			}*/
-			
-			
-			/*if (cam.getLeft().z > 0 || cam.getUp().y < 0) {
-				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, cam.getDirection().z), new Vector3f(cam.getUp().x, 0,0));
-			}*/
-			
-			/*if (cam.getLeft().z > 0 || cam.getUp().y < 0) {
-				//cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, cam.getDirection().z), new Vector3f(0, cam.getUp().y, cam.getUp().z));
-				cam.lookAtDirection(new Vector3f(0, 1, 1), new Vector3f(0, cam.getUp().y, cam.getUp().z));
-			}*/
-			
-			/*if (cam.getLeft().z > 0 || cam.getUp().y < 0) {
-				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, cam.getDirection().z), new Vector3f(cam.getUp().x, cam.getUp().y, 0));
-			}*/
-			
-			
-		
-			
-			
-			
-			
-			
-			 
-			
-			// More like it, but not really. 
-			/*if (cam.getDirection().y > FastMath.QUARTER_PI || cam.getDirection().y < -FastMath.QUARTER_PI) { 
-				
-				//Vector3f cam_dir = cam.getDirection();
-				//Vector3f camera = new Vector3f(cam_dir.getX(), FastMath.QUARTER_PI, cam_dir.getZ());
-				cam.lookAtDirection(new Vector3f(0, cam.getDirection().y, 0), new Vector3f(cam.getDirection().x, 0, cam.getDirection().z));
-			}*/
+			if (dir.angleBetween(cam.getDirection()) > 1f) {
+				cam.lookAtDirection(new Vector3f(1.1f - cam.getDirection().x, cam.getDirection().y, cam.getDirection().z), new Vector3f(0, cam.getUp().y, 0));
+			} 	
 		}
 		
 		// Handling the text announcements
@@ -639,19 +587,20 @@ public class Main extends SimpleApplication implements ActionListener {
 		//playerModel.setLocalTranslation(new Vector3f(0f,-1.0f, 0f));
 		//playerModel.addControl(player);
 		
+		player.setJumpSpeed(25);
+		player.setFallSpeed(40);
+		player.setGravity(80);
 		
 		
+		// GOD MODE FOR DEBUG
+		/*
 		player.setJumpSpeed(20); 	
 		player.setFallSpeed(30); 	
-		player.setGravity(80); 		
+		player.setGravity(80); 	
+		*/
+		
 		player.setPhysicsLocation(new Vector3f(0, 10, 0));
 		bulletAppState.getPhysicsSpace().add(player);
-		
-		
-		
-		
-		
-		
 	}
  
 	// Make solid ground and add it to scene
