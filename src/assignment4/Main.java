@@ -355,8 +355,26 @@ public class Main extends SimpleApplication implements ActionListener {
 								manipulatables.detachChild(spatial);
 								inventory.attachChild(spatial);
 								
-								spatial.setLocalScale(150f);
-								spatial.setLocalTranslation(settings.getWidth()/2, settings.getHeight()/2, 0);	
+								// Rotating the rods
+								if (inventory.getChild(0).getName().equals("Destroyer") || inventory.getChild(0).getName().equals("Creator")) {
+									
+									Quaternion rotate_x = new Quaternion(); 
+									rotate_x.fromAngleAxis(FastMath.PI/2, new Vector3f(1, 0, 0));  
+									
+									Quaternion rotate_z = new Quaternion(); 
+									rotate_z.fromAngleAxis(FastMath.PI/12, new Vector3f(0, 1, 0));  
+									
+									spatial.setLocalRotation(rotate_x);
+									spatial.rotate(rotate_z);
+									
+									spatial.setLocalScale(150f);
+									spatial.setLocalTranslation(settings.getWidth()/1.5f, settings.getHeight()/4, 0);	
+									
+								} else {
+									spatial.setLocalScale(150f);
+									spatial.setLocalTranslation(settings.getWidth()/2, settings.getHeight()/2, 0);	
+									
+								}
 								
 								selected_object = spatial;
 				
@@ -516,7 +534,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		// Adding a point light from HAL
 		PointLight light_hal = new PointLight();
 		light_hal.setColor(ColorRGBA.White);
-		light_hal.setRadius(6000f);
+		light_hal.setRadius(600f);
 		light_hal.setPosition(new Vector3f(-95, 20, 0));
 		rootNode.addLight(light_hal);
 		
@@ -581,18 +599,12 @@ public class Main extends SimpleApplication implements ActionListener {
 	public void initPlayer() {
 		player = new CharacterControl(new CapsuleCollisionShape(1.5f, 6f), 0.05f);
 		
-		//TODO: For adding some kind of model to the player
-		//playerModel = (Node) assetManager.loadModel("Models/TestChar.mesh.j3o");
-		//playerModel.setLocalScale(0.5f);
-		//playerModel.setLocalTranslation(new Vector3f(0f,-1.0f, 0f));
-		//playerModel.addControl(player);
-		
 		player.setJumpSpeed(25);
 		player.setFallSpeed(40);
 		player.setGravity(80);
 		
 		
-		// GOD MODE FOR DEBUG
+		// GOD MODE SETTINGS FOR DEBUG
 		/*
 		player.setJumpSpeed(20); 	
 		player.setFallSpeed(30); 	

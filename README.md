@@ -9,7 +9,6 @@ ToDo List
 
 #### Not-So-Important
 
-##### Adding Some Player Model
 ##### Adding the Enlarger
 ##### Adding the Shrinker
 
@@ -30,13 +29,13 @@ The controls and the general player concept was inspired from the **HelloCollisi
 
 ### "Features" aka Bugs or Unfinished
 #### Boundary-Penetrating Rod-Like Objects
-When an object is thrown upwards, it might penetrate the floor when falling down. Possibly just make the floow thicker or "denser", somehow? Changing bulletAppState to update more often? Refresh times on collision, increase them?
+**Minor.** When an object is thrown upwards, it might penetrate the floor when falling down.
 
 #### Vision-Distorting Wheel-Zoom Effect
-By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation. Not really sure how to turn it off, efficiently.
+**Minor.** By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation. Not really sure how to turn it off, efficiently.
 
 #### Border-Zone Cam-Vibrations
-When in HAL9000-mode and you pan the camera to the edge, the camera shakes a bit due to how i implemented the limited camera panning. Very minor, but still a bit on an annoyance.
+**Minor.** When in HAL9000-mode and you pan the camera to the edge, the camera shakes a bit due to how i implemented the limited camera panning. Very minor, but still a bit on an annoyance.
 
 ### Required Features Implemented
 ##### Supports Egocentric Locomotion
