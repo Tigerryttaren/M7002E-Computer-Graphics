@@ -64,12 +64,12 @@ public class Main extends SimpleApplication implements ActionListener {
     private Node inventory;
     private Node announcer;
     
-    private Picture hal_mode;
-    private boolean hal_text_on = false;
+    private Picture PAL_mode;
+    private boolean PAL_text_on = false;
     
     private int camera_position = 0;
     private Vector3f last_player_camera_direction;
-    private Vector3f last_hal_camera_direction = new Vector3f(15f,  0f, 0f);
+    private Vector3f last_PAL_camera_direction = new Vector3f(15f,  0f, 0f);
 
     private Vector3f last_scale;
     private RigidBodyControl last_physical;
@@ -79,21 +79,21 @@ public class Main extends SimpleApplication implements ActionListener {
 	Material wall_material;
 	Material biobox_material;
 	Material containmentcontainer_material;
-	Material hal9000_material;
+	Material PAL_material;
 	Material door_material;
 	Material lamp_material;
 	
 	private RigidBodyControl ground_physical;
 	private RigidBodyControl ceiling_physical;
 	private RigidBodyControl wall_physical;
-	private RigidBodyControl hal9000_physical;
+	private RigidBodyControl PAL_physical;
 	private RigidBodyControl door_physical;
 	private RigidBodyControl lamp_physical;
 
 	private static final Box ground;
 	private static final Box ceiling;
 	private static final Box wall;
-	private static final Box hal9000;
+	private static final Box PAL;
 	private static final Box door;
 	private static final Box lamp;
 	
@@ -114,8 +114,8 @@ public class Main extends SimpleApplication implements ActionListener {
 		wall = new Box(2f, 100f, 100f);
 		wall.scaleTextureCoordinates(new Vector2f(6, 6));
     	
-		hal9000 = new Box(0.5f, 6f, 2f);
-		hal9000.scaleTextureCoordinates(new Vector2f(3, 6));
+		PAL = new Box(0.5f, 6f, 2f);
+		PAL.scaleTextureCoordinates(new Vector2f(3, 6));
 		
 		lamp = new Box(3f, 0.1f, 3f);
 		lamp.scaleTextureCoordinates(new Vector2f(1, 1));
@@ -181,12 +181,12 @@ public class Main extends SimpleApplication implements ActionListener {
 		initLight();
 		initContainmentContainers();
 		initBioBoxes();
-		initHal9000();
+		initPAL();
 		initDoor();
 		initLamp();
 		initPlayer();
 		initCrossHair();
-		initHALMode();
+		initPALMode();
 		initRods();	
 	}
 		
@@ -262,19 +262,24 @@ public class Main extends SimpleApplication implements ActionListener {
 		if (key_binding.equals("Switch") && selected_object == null) {		
 			if (is_pressed == true) {
 				if (camera_position == 0) {
-					// Switching to HAL9000 mode
+					// Switching to PAL9001 mode
 					last_player_camera_direction = cam.getDirection();
 					//last_player_camera_location = cam.getLocation();
 					
-					guiNode.attachChild(hal_mode);
+					guiNode.attachChild(PAL_mode);
 					
-					cam.lookAtDirection(last_hal_camera_direction, Vector3f.UNIT_Y);
+					cam.lookAtDirection(last_PAL_camera_direction, Vector3f.UNIT_Y);
+					left = false;
+					right = false;
+					forward = false;
+					backward = false;
 					camera_position = 1;
 					
 				} else if (camera_position == 1) {
 					// Switching to player mode
-					guiNode.detachChild(hal_mode);
-					last_hal_camera_direction = cam.getDirection();
+					
+					guiNode.detachChild(PAL_mode);
+					last_PAL_camera_direction = cam.getDirection();
 					cam.lookAtDirection(last_player_camera_direction, Vector3f.UNIT_Y);
 					camera_position = 0;					
 				}
@@ -408,12 +413,12 @@ public class Main extends SimpleApplication implements ActionListener {
 					text.setText("I'm sorry, Dave. I'm afraid I can't do that.");        
 					text.setLocalTranslation(settings.getWidth()/4 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/1.7f + text.getLineHeight()/6, 0);
 					
-					if (hal_text_on == true) {
+					if (PAL_text_on == true) {
 						announcer.attachChild(text);
-						hal_text_on = false;
-					} else if (hal_text_on == false) {
+						PAL_text_on = false;
+					} else if (PAL_text_on == false) {
 						announcer.detachAllChildren();
-						hal_text_on = true;
+						PAL_text_on = true;
 					}
 				}
 			}		
@@ -605,12 +610,12 @@ public class Main extends SimpleApplication implements ActionListener {
 		light_ceiling.setPosition(new Vector3f(0, 50, 0));
 		rootNode.addLight(light_ceiling);
 		
-		// Adding a point light from HAL
-		PointLight light_hal = new PointLight();
-		light_hal.setColor(ColorRGBA.White);
-		light_hal.setRadius(600f);
-		light_hal.setPosition(new Vector3f(-95, 20, 0));
-		rootNode.addLight(light_hal);
+		// Adding a point light from PAL
+		PointLight light_PAL = new PointLight();
+		light_PAL.setColor(ColorRGBA.White);
+		light_PAL.setRadius(600f);
+		light_PAL.setPosition(new Vector3f(-95, 20, 0));
+		rootNode.addLight(light_PAL);
 		
 		// Shadows
 		final int SHADOWMAP_SIZE = 512;
@@ -620,11 +625,11 @@ public class Main extends SimpleApplication implements ActionListener {
         
         plsr_ceiling.setFlushQueues(false);
         
-        PointLightShadowRenderer plsr_hal = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
-        plsr_hal.setLight(light_hal);
+        PointLightShadowRenderer plsr_PAL = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
+        plsr_PAL.setLight(light_PAL);
         
         viewPort.addProcessor(plsr_ceiling);
-        viewPort.addProcessor(plsr_hal);	
+        viewPort.addProcessor(plsr_PAL);	
 	}
  
 	// Materials used in the scene
@@ -656,11 +661,11 @@ public class Main extends SimpleApplication implements ActionListener {
 		Texture lamp_texture = assetManager.loadTexture(lamp_key);
 		lamp_material.setTexture("DiffuseMap", lamp_texture);
 	
-		hal9000_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-		TextureKey hal9000_key = new TextureKey("HAL9000.jpg");
-		hal9000_key.setGenerateMips(true);
-		Texture hal9000_texture = assetManager.loadTexture(hal9000_key);
-		hal9000_material.setTexture("DiffuseMap", hal9000_texture);
+		PAL_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+		TextureKey PAL_key = new TextureKey("PAL9001.jpg");
+		PAL_key.setGenerateMips(true);
+		Texture PAL_texture = assetManager.loadTexture(PAL_key);
+		PAL_material.setTexture("DiffuseMap", PAL_texture);
 	    
 		door_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey door_key = new TextureKey("dark_steel_door.jpg");
@@ -870,35 +875,35 @@ public class Main extends SimpleApplication implements ActionListener {
 		return cube_geometry;
 	}
 	
-	// Making all HAL9000s
-	public void initHal9000(){
-		rootNode.attachChild(makeHal9000(-99.6f, 30, 0, 2, 0, 0, 0, 4));
+	// Making all PAL9001s
+	public void initPAL(){
+		rootNode.attachChild(makePAL(-99.6f, 30, 0, 2, 0, 0, 0, 4));
 	}
 	
-	// Make a single HAL9000
-	private Geometry makeHal9000(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale) {
-		Geometry hal9000_geometry = new Geometry("HAL9000", hal9000);
-		hal9000_geometry.setMaterial(hal9000_material);
+	// Make a single PAL9001
+	private Geometry makePAL(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale) {
+		Geometry PAL_geometry = new Geometry("PAL9001", PAL);
+		PAL_geometry.setMaterial(PAL_material);
 		
 		// Translating to its location
-		hal9000_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
-		hal9000_geometry.setLocalScale(scale);
+		PAL_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
+		PAL_geometry.setLocalScale(scale);
 		
-		hal9000_geometry.setShadowMode(ShadowMode.Receive);
+		PAL_geometry.setShadowMode(ShadowMode.Receive);
 		
 		// Using a quaternion to save a rotation to be used
 		Quaternion rotate90 = new Quaternion(); 
 		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
-		hal9000_geometry.setLocalRotation(rotate90);
+		PAL_geometry.setLocalRotation(rotate90);
 		
 		// Scales the textures
-		hal9000_geometry.getMesh().scaleTextureCoordinates(new Vector2f(0.335f, 0.166f));
+		PAL_geometry.getMesh().scaleTextureCoordinates(new Vector2f(0.335f, 0.166f));
 		
 		// Creates the physical with mass as argument
-		hal9000_physical = new RigidBodyControl(0f);
-		hal9000_geometry.addControl(hal9000_physical);
-		bulletAppState.getPhysicsSpace().add(hal9000_physical);
-		return hal9000_geometry;
+		PAL_physical = new RigidBodyControl(0f);
+		PAL_geometry.addControl(PAL_physical);
+		bulletAppState.getPhysicsSpace().add(PAL_physical);
+		return PAL_geometry;
 	}
 	
 	// Making all doors
@@ -949,11 +954,11 @@ public class Main extends SimpleApplication implements ActionListener {
 		return lamp_geometry;
 	}
 	
-	public void initHALMode() {
-		hal_mode = new Picture("HAL9000 Mode");
-		hal_mode.setImage(assetManager, "hal_mode_filter.png", true);
-		hal_mode.setHeight(settings.getHeight());
-		hal_mode.setWidth(settings.getWidth());	
+	public void initPALMode() {
+		PAL_mode = new Picture("PAL9001 Mode");
+		PAL_mode.setImage(assetManager, "PAL_mode_filter.png", true);
+		PAL_mode.setHeight(settings.getHeight());
+		PAL_mode.setWidth(settings.getWidth());	
 	}
 	
 	// Crosshairs

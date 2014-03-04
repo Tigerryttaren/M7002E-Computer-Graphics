@@ -1,6 +1,6 @@
 Assignment 4
 =======================
-### Introduction  or Plot
+### Introduction To Situation
 You are Dave, a newborn age-acceletrated synthetic human being. You goal is to learn some basic motor skills and throw stuff around, while learing how to operate the **R.O.D.S.** or **R**od-like **O**bject of **D**oing **S**tuff. The sinister and ever-helpful PAL9001, **P**ropably-evil **AL**gorithmic computer model **9001**, is watching your every move. Have a nice day.
 
 ### Disclaimer
@@ -10,7 +10,7 @@ This hilariously monolithic file could and propbably should be split up in sever
 
 ### "Features"
 #### Boundary-Penetrating Rod-Like Objects
-When an object is thrown upwards, it might penetrate the floor when falling down.
+When an object is thrown upwards, there is a slight chance it might penetrate the floor when falling down.
 
 #### Vision-Distorting Mouse-Wheel Zoom Effect
 By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation, and no simple and efficient solution was found.
@@ -62,6 +62,10 @@ Use the **TAB** key to switch between the point of view of the player and the po
 ### Resources
 #### Code Examples
 - [jMonkey Tutorials](http://hub.jmonkeyengine.org/wiki/doku.php/jme3#tutorials_for_beginners)
+- [jMonkey Tutorial Hello Picking](http://hub.jmonkeyengine.org/wiki/doku.php/jme3:beginner:hello_picking)
+- [jMonkey Tutorial Hello Collision] (http://hub.jmonkeyengine.org/wiki/doku.php/jme3:beginner:hello_collision)
+- [jMonkey Tutorial Hello Physics] (http://hub.jmonkeyengine.org/wiki/doku.php/jme3:beginner:hello_physics)
+
 #### Texture References
 The textures for this project was borrowed from these sites and projects. All credit to their creators.
 - [Black Tile Texture](http://www.moddb.com/mods/h2f/images/the-even-newer-panel-texture1)
