@@ -232,14 +232,14 @@ public class Main extends SimpleApplication implements ActionListener {
 			BitmapText text = new BitmapText(guiFont, false);
 			text.setSize(guiFont.getCharSet().getRenderedSize()*2);
 			
-			if (selected_object.getName().equals("Creator")) {
-				text.setText("Wielding the Creator!");        
-			} else if (selected_object.getName().equals("Destroyer")) {
-				text.setText("Wielding the Destroyer!");      
-			} else if (selected_object.getName().equals("Enlarger")) {
-				text.setText("Wielding the Enlarger!");      
-			} else if (selected_object.getName().equals("Shrinker")) {
-				text.setText("Wielding the Shrinker!");      
+			if (selected_object.getName().equals("Materializer")) {
+				text.setText("Materializer");        
+			} else if (selected_object.getName().equals("De-Materializer")) {
+				text.setText("De-Materializer");      
+			} else if (selected_object.getName().equals("Redshifter")) {
+				text.setText("Redshifter");      
+			} else if (selected_object.getName().equals("Blueshifter")) {
+				text.setText("Blueshifter");      
 			} else {
 				text.setText("");
 			}
@@ -326,13 +326,13 @@ public class Main extends SimpleApplication implements ActionListener {
 				if (is_pressed == true) {
 					// Check that you are holding the some item, else do not allow action
 					if (inventory.getChildren().isEmpty() == false) {
-						if (inventory.getChild(0).getName().equals("Creator") == true) {
+						if (inventory.getChild(0).getName().equals("Materializer") == true) {
 							operationCreate();
-						} else if (inventory.getChild(0).getName().equals("Destroyer") == true) {
+						} else if (inventory.getChild(0).getName().equals("De-Materializer") == true) {
 							operationDestroy();
-						} else if (inventory.getChild(0).getName().equals("Enlarger") == true) {
+						} else if (inventory.getChild(0).getName().equals("Redshifter") == true) {
 							operationEnlarge();
-						} else if (inventory.getChild(0).getName().equals("Shrinker") == true) {
+						} else if (inventory.getChild(0).getName().equals("Blueshifter") == true) {
 							operationShrink();
 						} else {
 							return;
@@ -368,10 +368,10 @@ public class Main extends SimpleApplication implements ActionListener {
 								inventory.attachChild(spatial);
 								
 								// Rotating the rods for correct holding
-								if (inventory.getChild(0).getName().equals("Creator") 
-										|| inventory.getChild(0).getName().equals("Destroyer") 
-										|| inventory.getChild(0).getName().equals("Enlarger") 
-										|| inventory.getChild(0).getName().equals("Shrinker")) {
+								if (inventory.getChild(0).getName().equals("Materializer") 
+										|| inventory.getChild(0).getName().equals("De-Materializer") 
+										|| inventory.getChild(0).getName().equals("Redshifter") 
+										|| inventory.getChild(0).getName().equals("Blueshifter")) {
 									
 									Quaternion rotate_x = new Quaternion(); 
 									rotate_x.fromAngleAxis(FastMath.PI/2, new Vector3f(1, 0, 0));  
@@ -677,7 +677,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		player.setFallSpeed(40);
 		player.setGravity(80);
 		
-		
+		//TODO: Remove
 		// GOD MODE SETTINGS FOR DEBUG
 		/*
 		player.setJumpSpeed(20); 	
@@ -809,10 +809,10 @@ public class Main extends SimpleApplication implements ActionListener {
 	}
 	
 	public void initRods () {
-		manipulatables.attachChild(makeRod("Creator", "rod_white.jpg", -50, 2, 5));
-		manipulatables.attachChild(makeRod("Destroyer", "rod_black.jpg", -50, 2, -5));
-		manipulatables.attachChild(makeRod("Enlarger", "rod_red.jpg", -40, 2, 5));
-		manipulatables.attachChild(makeRod("Shrinker", "rod_blue.jpg", -40, 2, -5));		
+		manipulatables.attachChild(makeRod("Materializer", "rod_white.jpg", -50, 2, 5));
+		manipulatables.attachChild(makeRod("De-Materializer", "rod_black.jpg", -50, 2, -5));
+		manipulatables.attachChild(makeRod("Redshifter", "rod_red.jpg", -40, 2, 5));
+		manipulatables.attachChild(makeRod("Blueshifter", "rod_blue.jpg", -40, 2, -5));		
 	}
 	
 	private Geometry makeRod(String name, String texture_path, float trans_x, float trans_y, float trans_z) {

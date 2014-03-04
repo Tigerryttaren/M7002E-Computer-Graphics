@@ -1,15 +1,15 @@
 Assignment 4
 =======================
-### "Disclaimer"
+### Disclaimer
 The controls and the general player concept was inspired from the **HelloCollisions.java** example, and crosshairs were taken pretty straight off from **HelloPhysics.java**. The **HelloPicking.java** example was used for learning how to do picking.
 
 This hilariously monolithic file could and propbably should be split up in several smaller files for readability, but so far, it has not turn out that way ;-)
 
-### "Features" aka Bugs or Unfinished
+### "Features"
 #### Boundary-Penetrating Rod-Like Objects
 When an object is thrown upwards, it might penetrate the floor when falling down.
 
-#### Vision-Distorting Wheel-Zoom Effect
+#### Vision-Distorting Mouse-Wheel Zoom Effect
 By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation, and no simple and efficient solution was found.
 
 #### Border-Zone Cam-Vibrations
@@ -19,14 +19,17 @@ When in HAL9000-mode and you pan the camera to the edge, the camera shakes a bit
 ##### Supports Egocentric Locomotion
 The concept of a player, who can move around, is affected by gravity, can manipulate his environment and more is supported.
 
-##### Picking
+##### Direct Picking
 Direct selection is implemented. The player has the ability to aim at an object and select it.
 
-##### At Least Two Point of Views
+##### (At Least) Two Point of Views
 THe user can switch camera view between the player character and the evil red surveilance eye a la HAL9000.
 
 ##### Look Somewhat Natural
 Utilizing pretty textures from the internet and rudimentary physics, the scene looks and feels at least somewhat natural. Also, acceptably realistic shadows are used. 
+
+##### Command Palette
+The way the user controls his environment is through objects. Pick one up, use the **USE** key and watch something happen. Rinse, and repeat.
 
 ### Instructions
 #### Moving the Player
@@ -35,11 +38,17 @@ Use the **WASD** and **SPACE** keys to move around the environment, as well as *
 #### Manipulating Objects
 Left-click the **MOUSE** to pick an object up, left-click again to simply drop the object. Right-clicking when holding an object will throw it away with force. Using the **E** key when holding some objects will make the player use the object on the environment.
 
-##### The Creator
-This ancient artifact in the form of a green rod is a powerful tool, it allows the player to magically create new boxes.
+##### The Materializer, The Creator
+This heavenly *white* strangely unsettling synthetically-made artifact has the godlike power to create objects from thin air. It is a powerful tool to create boxes for the player to play with.
 
-##### The Destroyer
-The evil twin of the Creator, the red rod called the Destroyer will destroy the boxes it is used on. 
+##### The De-Materializer, The Destroyer
+This terrificly horrifying *black* rod has the power to undo creations, and send them back to the *Very Vast Void of Uncreated Creations*. It is the evil adopted twin of the Creator, and allows the player to remove boxes.
+
+##### The Redshifter, The Enlarger
+This bright *red* rod has the awesome power to enlarge objects simply by tapping the with the rod. Its nickname is inspired from the Doppler effect on electromagnetic waves, where Redshifting is when an on object is increased in wavelength, but in this case, in size.
+
+##### The Blueshifter, The Shrinker
+This somberly *blue* rod has the power to shrink objects. As its red twin the name is inspired from the blueshift of the Dopplere ecceft on electromagnetic waves. 
 
 ##### BioBoxes
 These small red boxes containing extremely hazardous biological waste can be tossed around in an playful manner, but cannot really be used as anything other than a building block.
