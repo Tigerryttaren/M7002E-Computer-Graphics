@@ -9,14 +9,8 @@ The controls and the general player concept was inspired from the **HelloCollisi
 This hilariously monolithic file could and propbably should be split up in several smaller files for readability, but so far, it has not turn out that way ;-)
 
 ### "Features"
-#### Boundary-Penetrating Rod-Like Objects
-When an object is thrown upwards, there is a slight chance it might penetrate the floor when falling down.
-
 #### Vision-Distorting Mouse-Wheel Zoom Effect
 By default, the FlyCam has the mouse wheel zoom enabled, which will distort the view if fiddled with. This was not as straight forward as deleting the key mapping for those operation, and no simple and efficient solution was found.
-
-#### Border-Zone Cam-Vibrations
-When in PAL-mode and you pan the camera to the edge, the camera shakes a bit due to how I implemented the limited camera panning. Very minor, but still a bit on an annoyance.
 
 ### Required Features Implemented
 ##### Supports Egocentric Locomotion
@@ -33,6 +27,16 @@ Utilizing pretty textures from the internet and rudimentary physics, the scene l
 
 ##### Command Palette
 The way the user controls his environment is through objects. Pick one up, use the **USE** key and watch something happen. Rinse, and repeat.
+
+### Possible Extra Features Implemented
+#### Proximity-Based Events
+When the player approaches the door, he will trigger a proximity based event.
+
+#### Proximity-Based Audio
+Also, when the player approaches the door, he will trigger a proximity-based aound effect. Try and approach PAL9001 in the wall and he'll talk to you.
+
+
+
 
 ### Instructions
 #### Moving the Player
@@ -65,6 +69,9 @@ Use the **TAB** key to switch between the point of view of the player and the po
 - [jMonkey Tutorial Hello Picking](http://hub.jmonkeyengine.org/wiki/doku.php/jme3:beginner:hello_picking)
 - [jMonkey Tutorial Hello Collision] (http://hub.jmonkeyengine.org/wiki/doku.php/jme3:beginner:hello_collision)
 - [jMonkey Tutorial Hello Physics] (http://hub.jmonkeyengine.org/wiki/doku.php/jme3:beginner:hello_physics)
+
+#### Audio References
+- [HAL9000 Quotes](http://www.gotwavs.com/Movies/2001.html)
 
 #### Texture References
 The textures for this project was borrowed from these sites and projects. All credit to their creators.
