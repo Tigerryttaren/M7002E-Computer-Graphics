@@ -33,7 +33,14 @@ The way the user controls his environment is through objects. Pick one up, use t
 When the player approaches the door, he will trigger a proximity based event.
 
 #### Proximity-Based Audio
-Also, when the player approaches the door, he will trigger a proximity-based aound effect. Try and approach PAL9001 in the wall and he'll talk to you.
+When the player approaches the door, he will trigger a proximity-based aound effect. Also, try and approach PAL9001 in the wall and he'll tell you how it's going.
+
+#### User Allowed To Change Lighting
+The user can change the lighting of the room by turning on an off the large ceiling lamp.
+
+#### Light Following Spatial
+The red search light under the drone is attach to it and will follow it on its patrol route.
+
 
 
 
@@ -56,6 +63,9 @@ This bright *red* rod has the awesome power to enlarge objects simply by tapping
 
 ##### The Blueshifter
 This somberly *blue* rod has the power to shrink objects. As its red twin the name is inspired from the blueshift of the Dopplere ecceft on electromagnetic waves. Also known as The Shrinker.
+
+##### Light Swtich
+To the left of PAL9001 there is a very small switch on the wall. When the user walks up to it and pressed the **E** key, the light switches mode.
 
 ##### BioBoxes
 These small red boxes containing extremely hazardous biological waste can be tossed around in an playful manner, but cannot really be used as anything other than a building block. Use them to climb the larger yellow boxes! Fun!

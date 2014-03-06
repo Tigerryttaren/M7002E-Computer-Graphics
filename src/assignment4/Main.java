@@ -23,6 +23,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
+import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -34,6 +35,7 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.LightControl;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
@@ -84,9 +86,10 @@ public class Main extends SimpleApplication implements ActionListener {
     
     private AudioNode audio_PAL_cantdo;
     private AudioNode audio_PAL_well;
-    
+        
     private boolean contact_PAL_cantdo = false;
     private boolean contact_PAL_well = false;
+    private boolean ceiling_light_on = true;
     
 	Material ground_material;
 	Material ceiling_material;	
@@ -96,14 +99,10 @@ public class Main extends SimpleApplication implements ActionListener {
 	Material PAL_material;
 	Material door_material;
 	Material lamp_material;
+	Material light_switch_material;
 	
 	private MotionPath motionpath1;
-	//private MotionPath motionpath2;
-	//private MotionPath motionpath3;
-	
 	private MotionEvent motioncontrol1;
-	//private MotionEvent motioncontrol2;
-	//private MotionEvent motioncontrol3;
 	
 	private RigidBodyControl ground_physical;
 	private RigidBodyControl ceiling_physical;
@@ -111,6 +110,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	private RigidBodyControl PAL_physical;
 	private RigidBodyControl door_physical;
 	private RigidBodyControl lamp_physical;
+	private RigidBodyControl light_switch_physical;
 
 	private static final Box ground;
 	private static final Box ceiling;
@@ -118,9 +118,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	private static final Box PAL;
 	private static final Box door;
 	private static final Box lamp;
-	
-	private static final Cylinder creator;
-	private static final Cylinder destroyer;
+	private static final Box light_switch;
 	
 	private static final Cylinder rod;
 	
@@ -145,14 +143,11 @@ public class Main extends SimpleApplication implements ActionListener {
 		door = new Box(0.5f, 5.3f, 4.5f);
 		door.scaleTextureCoordinates(new Vector2f(3, 6));
 		
-		creator = new Cylinder(10, 50, 0.1f, 3f, true);
-		creator.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
-		
-		destroyer = new Cylinder(10, 50, 0.1f, 3f, true);
-		destroyer.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
-		
 		rod = new Cylinder(10, 50, 0.1f, 3f, true);
 		rod.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
+		
+		light_switch = new Box(0.2f, 0.2f, 0.2f);
+		light_switch.scaleTextureCoordinates(new Vector2f(1, 1));
 	}
 	
 	
@@ -212,6 +207,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		initDrones();
 		initDoor();
 		initLamp();
+		initLightSwitch();
 		initPlayer();
 		initCrossHair();
 		initPALMode();
@@ -256,68 +252,41 @@ public class Main extends SimpleApplication implements ActionListener {
 			} 	
 		}
 		
-		
-		//TODO: Text, Light, and Audio
-		// EXPERIMENT WITH PROXIMITY
-		//CollisionResults collisions = new CollisionResults();
-		//Ray ray = new Ray(cam.getLocation(), cam.getDirection());
-		//proximity.collideWith(ray, collisions);
-		
 		Spatial door = proximity.getChild("Door");
 		if (door.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 25f) {
 			if (contact_PAL_cantdo == false) {
 				
-				// Adding the text
-				/*guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-				BitmapText text = new BitmapText(guiFont, false);
-				text.setSize(guiFont.getCharSet().getRenderedSize()*1.3f);
-				text.setText("PAL9001: I'm sorry, Dave. I'm afraid I can't do that.");        
-				text.setLocalTranslation(settings.getWidth()/24f - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/1.05f + text.getLineHeight()/6, 0);
-				proximity_text.attachChild(text);*/
-				
 				// Changing the lights
 				light_PAL.setColor(ColorRGBA.Red);
 				light_PAL.setRadius(60000f);
-				light_ceiling.setRadius(0f);
+				if (ceiling_light_on == true) {
+					light_ceiling.setRadius(0f);
+				}
 				
-				//audio_PAL_cantdo.playInstance();
 				audio_PAL_cantdo.play();
 				contact_PAL_cantdo = true;
 			}
 		} else {
-			// Removing the text
-			//proximity_text.detachAllChildren();
+			// Resetting the lights
 			light_PAL.setColor(ColorRGBA.White);
-			light_ceiling.setRadius(600f);
-			
+			if (ceiling_light_on == true) {
+				light_ceiling.setRadius(600f);
+			}
 			contact_PAL_cantdo = false;
 		}
 		
 		Spatial pal = proximity.getChild("PAL9001");
 		if (pal.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 50f) {
 			if (contact_PAL_well == false) {
-				
-				// Adding the text
-				/*guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-				BitmapText text = new BitmapText(guiFont, false);
-				text.setSize(guiFont.getCharSet().getRenderedSize()*1.3f);
-				text.setText("PAL9001: Everything is going extremely well.");        
-				text.setLocalTranslation(settings.getWidth()/24f - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/1.05f + text.getLineHeight()/6, 0);
-				proximity_text.attachChild(text);*/
-				
-				
-				//audio_PAL_cantdo.playInstance();
+			
 				audio_PAL_well.play();
 				contact_PAL_well = true;
 			}
 		} else {
-			// Removing the text
-			//proximity_text.detachAllChildren();
 			contact_PAL_well = false;
 		}
-		
-
-		
+	
+		motioncontrol1.play();
 		
 		// Handling the text announcements
 		if (!(selected_object == null)) {
@@ -422,6 +391,32 @@ public class Main extends SimpleApplication implements ActionListener {
 				}	    	
 			} else if (key_binding.equals("Use")) {
 				if (is_pressed == true) {
+					
+					// For the light switch
+					if (inventory.getChildren().isEmpty() == true) {
+						CollisionResults collisions = new CollisionResults();
+						Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+						rootNode.collideWith(ray, collisions);
+						
+						if (collisions.size() > 0) {
+							CollisionResult closest = collisions.getClosestCollision();
+							Spatial spatial = closest.getGeometry();
+							
+							if (spatial.getName().equals("LightSwitch") && spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 15f) {
+								if (ceiling_light_on == true) {
+									
+									light_ceiling.setRadius(1f);
+									ceiling_light_on = false;
+									
+								} else if (ceiling_light_on == false) {
+									
+									light_ceiling.setRadius(60000f);
+									ceiling_light_on = true;
+								}
+							}
+						}
+					}
+						
 					// Check that you are holding the some item, else do not allow action
 					if (inventory.getChildren().isEmpty() == false) {
 						if (inventory.getChild(0).getName().equals("Materializer") == true) {
@@ -697,7 +692,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		guiNode.addLight(hud_light);
 		
 		// Adding a light from the ceiling
-		//PointLight light_ceiling = new PointLight();
 		light_ceiling = new PointLight();
 		light_ceiling.setColor(ColorRGBA.White);
 		light_ceiling.setRadius(600f);
@@ -705,7 +699,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		rootNode.addLight(light_ceiling);
 		
 		// Adding a point light from PAL
-		//PointLight light_PAL = new PointLight();
 		light_PAL = new PointLight();
 		light_PAL.setColor(ColorRGBA.White);
 		light_PAL.setRadius(600f);
@@ -724,7 +717,7 @@ public class Main extends SimpleApplication implements ActionListener {
         plsr_PAL.setLight(light_PAL);
         
         viewPort.addProcessor(plsr_ceiling);
-        viewPort.addProcessor(plsr_PAL);	
+        viewPort.addProcessor(plsr_PAL);
 	}
  
 	// Materials used in the scene
@@ -755,6 +748,12 @@ public class Main extends SimpleApplication implements ActionListener {
 		lamp_key.setGenerateMips(true);
 		Texture lamp_texture = assetManager.loadTexture(lamp_key);
 		lamp_material.setTexture("DiffuseMap", lamp_texture);
+		
+		light_switch_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+		TextureKey light_switch_key = new TextureKey("glow.jpg");
+		light_switch_key.setGenerateMips(true);
+		Texture light_switch_texture = assetManager.loadTexture(light_switch_key);
+		light_switch_material.setTexture("DiffuseMap", light_switch_texture);
 	
 		PAL_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey PAL_key = new TextureKey("PAL9001.jpg");
@@ -776,14 +775,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		player.setJumpSpeed(25);
 		player.setFallSpeed(40);
 		player.setGravity(80);
-		
-		//TODO: Remove
-		// GOD MODE SETTINGS FOR DEBUG
-		/*
-		player.setJumpSpeed(20); 	
-		player.setFallSpeed(30); 	
-		player.setGravity(80); 	
-		*/
 		
 		player.setPhysicsLocation(new Vector3f(0, 10, 0));
 		bulletAppState.getPhysicsSpace().add(player);
@@ -887,7 +878,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		cube_geometry.setLocalTranslation(new Vector3f(trans_x, trans_y, trans_z));
 		Material cube_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		Texture cube_texture = assetManager.loadTexture("containmentcontainer.png");
-		//Texture cube_texture = assetManager.loadTexture("crate.jpg");
 		cube_material.setTexture("DiffuseMap", cube_texture);
 	    
 		// Using a quaternion to save a rotation to be used on the wall
@@ -921,8 +911,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		Material rod_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		Texture rod_texture = assetManager.loadTexture(texture_path);
 		rod_material.setTexture("DiffuseMap", rod_texture);
-		
-		//rod_material.setTexture("NormalMap", assetManager.loadTexture(map_path));
 	    
 		rod_geometry.setLocalScale(1f);
 		rod_geometry.setMaterial(rod_material);
@@ -1051,6 +1039,23 @@ public class Main extends SimpleApplication implements ActionListener {
 		return lamp_geometry;
 	}
 	
+	public void initLightSwitch() {
+		rootNode.attachChild(makeLightSwitch());
+	}
+	
+	private Geometry makeLightSwitch() {
+		Geometry light_switch_geometry = new Geometry("LightSwitch", light_switch);
+		light_switch_geometry.setMaterial(light_switch_material);
+		light_switch_geometry.setLocalTranslation(-97.8f, 5, 20);
+				
+		light_switch_geometry.setShadowMode(ShadowMode.Cast);
+	
+		light_switch_physical = new RigidBodyControl(0.0f);
+		light_switch_geometry.addControl(light_switch_physical);
+		bulletAppState.getPhysicsSpace().add(light_switch_physical);	
+		return light_switch_geometry;
+	}
+	
 	public void initPALMode() {
 		PAL_mode = new Picture("PAL9001 Mode");
 		PAL_mode.setImage(assetManager, "PAL_mode_filter.png", true);
@@ -1059,9 +1064,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	}
 	
 	public void initDrones() {
-		manipulatables.attachChild(makeDrone(75f, 10f, 75f, 2, 1, 0, 0, 1.0f, 0f, "Drone1"));
-		//manipulatables.attachChild(makeDrone(-30f, 40f, 30f, 2, 1, 0, 0, 1.0f, 0f, "Drone2"));
-		//manipulatables.attachChild(makeDrone(15f, 20f, 15f, 2, 1, 0, 0, 1.0f, 0f, "Drone3"));
+		proximity.attachChild(makeDrone(75f, 25f, 75f, 2, 1, 0, 0, 1.0f, 0f, "Drone1"));
 	}
 	
 	private Geometry makeDrone(float trans_x, float trans_y, float trans_z, float rad, float rot_x, float rot_y, float rot_z, float scale, float mass, String name) {
@@ -1072,16 +1075,22 @@ public class Main extends SimpleApplication implements ActionListener {
 		Texture drone_texture = assetManager.loadTexture("drone.jpg");
 		drone_material.setTexture("ColorMap", drone_texture);
 		
-		// Using a quaternion to save a rotation to be used
-		Quaternion rotate90 = new Quaternion(); 
-		rotate90.fromAngleAxis(FastMath.PI/rad, new Vector3f(rot_x, rot_y, rot_z));  
-		drone_geometry.setLocalRotation(rotate90);
-		
 		drone_geometry.setLocalScale(scale);
 		drone_geometry.setMaterial(drone_material);
 		
 		CollisionShape drone_shape = CollisionShapeFactory.createDynamicMeshShape(drone_geometry);
 		RigidBodyControl drone_physical = new RigidBodyControl(drone_shape, mass);
+		
+		// The spotlight of the drone
+		SpotLight light_drone = new SpotLight();
+		light_drone.setSpotRange(100000000f);
+		light_drone.setSpotInnerAngle(35f * FastMath.DEG_TO_RAD);
+		light_drone.setSpotOuterAngle(45f * FastMath.DEG_TO_RAD);
+		light_drone.setColor(ColorRGBA.Red.mult(1.3f));
+		light_drone.setDirection(Vector3f.UNIT_X.negate()); 
+		rootNode.addLight(light_drone);
+		LightControl light_control_drone = new LightControl(light_drone);
+		drone_geometry.addControl(light_control_drone);
 		
 		drone_geometry.addControl(drone_physical);
 		bulletAppState.getPhysicsSpace().add(drone_physical);
@@ -1089,8 +1098,7 @@ public class Main extends SimpleApplication implements ActionListener {
 	}
 	
 	public void initAudio() {
-		
-		// I'm sorry, Dave. I'm afraid I can do that.
+		// Quote: I'm sorry, Dave. I'm afraid I can do that.
 		audio_PAL_cantdo = new AudioNode(assetManager, "audio/cantdo.wav", false);
 		audio_PAL_cantdo.setPositional(false);
 		audio_PAL_cantdo.setLooping(false);
@@ -1098,7 +1106,7 @@ public class Main extends SimpleApplication implements ActionListener {
 		audio_PAL_cantdo.setReverbEnabled(false);
 		rootNode.attachChild(audio_PAL_cantdo);
 		
-		// Everything is going extremely well.
+		// Quote: Everything is going extremely well.
 		audio_PAL_well = new AudioNode(assetManager, "audio/well.wav", false);
 		audio_PAL_well.setPositional(false);
 		audio_PAL_well.setLooping(false);
@@ -1109,27 +1117,28 @@ public class Main extends SimpleApplication implements ActionListener {
 	
 	public void initMotions() {
 		// Makes the motion path for the first drone
-		Spatial spatial = manipulatables.getChild("Drone1");
+		Spatial spatial = proximity.getChild("Drone1");
 		initMotionPath1(spatial);
-		
 	}
 	
 	public void initMotionPath1 (Spatial spatial) {
 		// Drawing the animation path
 		motionpath1 = new MotionPath();
-		motionpath1.addWayPoint(new Vector3f(75, 10, 75));
-		motionpath1.addWayPoint(new Vector3f(75, 10, -75));
-		motionpath1.addWayPoint(new Vector3f(-75, 10, -75));
-		motionpath1.addWayPoint(new Vector3f(-75, 10, 75));
+		motionpath1.addWayPoint(new Vector3f(75, 25, 75));
+		motionpath1.addWayPoint(new Vector3f(75, 25, -75));
+		motionpath1.addWayPoint(new Vector3f(-75, 25, -75));
+		motionpath1.addWayPoint(new Vector3f(-75, 25, 75));
 		 
 		// Closing it into a cycle
 		motionpath1.setCycle(true);
-		motionpath1.enableDebugShape(assetManager, rootNode) ;
+		
+		//For debugging the motion path
+		//motionpath1.enableDebugShape(assetManager, rootNode);
 		
 		motioncontrol1 = new MotionEvent(spatial, motionpath1);
-		motioncontrol1.setDirectionType(MotionEvent.Direction.PathAndRotation);
+		motioncontrol1.setDirectionType(MotionEvent.Direction.Path);
 		motioncontrol1.setRotation(new Quaternion().fromAngleNormalAxis(FastMath.HALF_PI, Vector3f.UNIT_X));
-		motioncontrol1.setInitialDuration(10f);
+		motioncontrol1.setInitialDuration(20f);
 		motioncontrol1.setSpeed(0.5f);       
 	}
 	
