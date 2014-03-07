@@ -70,9 +70,9 @@ public class Main extends SimpleApplication implements ActionListener {
     private Node announcer;
     private Node proximity;
     private Node proximity_text;
+    private Node proximity_light_switch_text;
     
     private Picture PAL_mode;
-    private boolean PAL_text_on = false;
     
     private int camera_position = 0;
     private Vector3f last_player_camera_direction;
@@ -94,12 +94,10 @@ public class Main extends SimpleApplication implements ActionListener {
 	Material ground_material;
 	Material ceiling_material;	
 	Material wall_material;
-	Material biobox_material;
 	Material containmentcontainer_material;
 	Material PAL_material;
 	Material door_material;
 	Material lamp_material;
-	Material light_switch_material;
 	
 	private MotionPath motionpath1;
 	private MotionEvent motioncontrol1;
@@ -118,7 +116,6 @@ public class Main extends SimpleApplication implements ActionListener {
 	private static final Box PAL;
 	private static final Box door;
 	private static final Box lamp;
-	private static final Box light_switch;
 	
 	private static final Cylinder rod;
 	
@@ -145,9 +142,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		rod = new Cylinder(10, 50, 0.1f, 3f, true);
 		rod.scaleTextureCoordinates(new Vector2f(0.1f, 1f));
-		
-		light_switch = new Box(0.2f, 0.2f, 0.2f);
-		light_switch.scaleTextureCoordinates(new Vector2f(1, 1));
 	}
 	
 	
@@ -187,9 +181,11 @@ public class Main extends SimpleApplication implements ActionListener {
 		proximity = new Node("Proximity");
 		proximity_text = new Node("ProximityText");
 		inventory = new Node("Inventory");
+		proximity_light_switch_text = new Node ("ProximityLightSwitchText");
 		
 		guiNode.attachChild(inventory);
 		guiNode.attachChild(announcer);
+		guiNode.attachChild(proximity_light_switch_text);
 		guiNode.attachChild(proximity_text);
 		rootNode.attachChild(proximity);
 		rootNode.attachChild(manipulatables);	
@@ -275,6 +271,7 @@ public class Main extends SimpleApplication implements ActionListener {
 			contact_PAL_cantdo = false;
 		}
 		
+		// For playing proximity based PAL audio
 		Spatial pal = proximity.getChild("PAL9001");
 		if (pal.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 50f) {
 			if (contact_PAL_well == false) {
@@ -285,28 +282,74 @@ public class Main extends SimpleApplication implements ActionListener {
 		} else {
 			contact_PAL_well = false;
 		}
-	
+		
+		Spatial lsy = proximity.getChild("LightSwitchYellow");
+		if (lsy.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 15f && selected_object == null) {
+			
+			CollisionResults collisions = new CollisionResults();
+			Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+			proximity.collideWith(ray, collisions);
+			
+			if (collisions.size() > 0) {
+				CollisionResult closest = collisions.getClosestCollision();
+				Spatial spatial = closest.getGeometry();
+				guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+				BitmapText text = new BitmapText(guiFont, false);
+				text.setSize(guiFont.getCharSet().getRenderedSize());
+				text.setText("");
+				
+				if(spatial.getName().equals("LightSwitchDim") == true) {					
+					text.setText("Turn on/off the light!");				
+				} else if (spatial.getName().equals("LightSwitchWhite") == true) {
+					text.setText("Turn the light white!");	
+				} else if (spatial.getName().equals("LightSwitchYellow") == true) {
+					text.setText("Turn the light yellow!");	
+				} else if (spatial.getName().equals("LightSwitchRed") == true) {
+					text.setText("Turn the light red!");	
+				} else if (spatial.getName().equals("LightSwitchGreen") == true) {
+					text.setText("Turn the light green!");	
+				}
+				
+				text.setLocalTranslation(settings.getWidth()/2.2f - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/1.05f + text.getLineHeight()/6, 0);
+				proximity_light_switch_text.attachChild(text);
+			} else {
+				proximity_light_switch_text.detachAllChildren();
+			}
+				
+		} else {
+			proximity_light_switch_text.detachAllChildren();
+		}
+		
 		motioncontrol1.play();
 		
 		// Handling the text announcements
 		if (!(selected_object == null)) {
 			guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
 			BitmapText text = new BitmapText(guiFont, false);
+			BitmapText text_small = new BitmapText(guiFont, false);
 			text.setSize(guiFont.getCharSet().getRenderedSize()*2);
+			text_small.setSize(guiFont.getCharSet().getRenderedSize()*1);
 			
 			if (selected_object.getName().equals("Materializer")) {
-				text.setText("Materializer");        
+				text.setText("Materializer"); 
+				text_small.setText("Creates objects from thin air!"); 
 			} else if (selected_object.getName().equals("De-Materializer")) {
-				text.setText("De-Materializer");      
+				text.setText("De-Materializer"); 
+				text_small.setText("Destroys objects!"); 
 			} else if (selected_object.getName().equals("Redshifter")) {
-				text.setText("Redshifter");      
+				text.setText("Redshifter");  
+				text_small.setText("Makes objects larger!"); 
 			} else if (selected_object.getName().equals("Blueshifter")) {
-				text.setText("Blueshifter");      
+				text.setText("Blueshifter");   
+				text_small.setText("Makes objects smaller!"); 
 			} else {
 				text.setText("");
 			}
-			text.setLocalTranslation(settings.getWidth()/38 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/12 + text.getLineHeight()/6, 0);
+			text.setLocalTranslation(settings.getWidth()/38 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/6 + text.getLineHeight()/6, 0);
 			announcer.attachChild(text);
+			
+			text_small.setLocalTranslation(settings.getWidth()/38 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/12 + text.getLineHeight()/6, 0);
+			announcer.attachChild(text_small);
 		}
 	}
 	
@@ -401,8 +444,7 @@ public class Main extends SimpleApplication implements ActionListener {
 						if (collisions.size() > 0) {
 							CollisionResult closest = collisions.getClosestCollision();
 							Spatial spatial = closest.getGeometry();
-							
-							if (spatial.getName().equals("LightSwitch") && spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 15f) {
+							if (spatial.getName().equals("LightSwitchDim") && spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 15f) {
 								if (ceiling_light_on == true) {
 									
 									light_ceiling.setRadius(1f);
@@ -413,7 +455,15 @@ public class Main extends SimpleApplication implements ActionListener {
 									light_ceiling.setRadius(60000f);
 									ceiling_light_on = true;
 								}
-							}
+							} else if (spatial.getName().equals("LightSwitchWhite") && spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 15f) {
+								light_ceiling.setColor(ColorRGBA.White);
+							} else if (spatial.getName().equals("LightSwitchYellow") && spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 15f) {
+								light_ceiling.setColor(ColorRGBA.Yellow);
+							} else if (spatial.getName().equals("LightSwitchRed") && spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 15f) {
+								light_ceiling.setColor(ColorRGBA.Red);
+							} else if (spatial.getName().equals("LightSwitchGreen") && spatial.getControl(RigidBodyControl.class).getPhysicsLocation().distance(cam.getLocation()) < 15f) {
+								light_ceiling.setColor(ColorRGBA.Green);
+							} 
 						}
 					}
 						
@@ -492,24 +542,6 @@ public class Main extends SimpleApplication implements ActionListener {
 					}
 				}		
 			} 
-		} else if (camera_position == 1) {			
-			if (key_binding.equals("Use")) {
-				if (is_pressed == true) {
-					guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-					BitmapText text = new BitmapText(guiFont, false);
-					text.setSize(guiFont.getCharSet().getRenderedSize()*2);
-					text.setText("I'm sorry, Dave. I'm afraid I can't do that.");        
-					text.setLocalTranslation(settings.getWidth()/4 - guiFont.getCharSet().getRenderedSize()/(3*2), settings.getHeight()/1.7f + text.getLineHeight()/6, 0);
-					
-					if (PAL_text_on == true) {
-						announcer.attachChild(text);
-						PAL_text_on = false;
-					} else if (PAL_text_on == false) {
-						announcer.detachAllChildren();
-						PAL_text_on = true;
-					}
-				}
-			}		
 		} 
 	}
 	
@@ -581,6 +613,14 @@ public class Main extends SimpleApplication implements ActionListener {
 		if (collisions.size() > 0) {
 			CollisionResult closest = collisions.getClosestCollision();
 			Spatial spatial = closest.getGeometry();
+			
+			if (spatial.getName().equals("Materializer") 
+					|| spatial.getName().equals("De-Materializer")
+					|| spatial.getName().equals("Redshifter")
+					|| spatial.getName().equals("Blueshifter")) {
+				return;
+			}
+			
 			bulletAppState.getPhysicsSpace().remove(spatial.getControl(RigidBodyControl.class));
 			spatial.removeControl(RigidBodyControl.class);
 			manipulatables.detachChild(spatial);
@@ -595,6 +635,13 @@ public class Main extends SimpleApplication implements ActionListener {
 		if (collisions.size() > 0) {
 			CollisionResult closest = collisions.getClosestCollision();
 			Spatial spatial = closest.getGeometry();
+			
+			if (spatial.getName().equals("Materializer") 
+					|| spatial.getName().equals("De-Materializer")
+					|| spatial.getName().equals("Redshifter")
+					|| spatial.getName().equals("Blueshifter")) {
+				return;
+			}
 			
 			bulletAppState.getPhysicsSpace().remove(spatial.getControl(RigidBodyControl.class));
 			spatial.removeControl(RigidBodyControl.class);
@@ -625,6 +672,13 @@ public class Main extends SimpleApplication implements ActionListener {
 		if (collisions.size() > 0) {
 			CollisionResult closest = collisions.getClosestCollision();
 			Spatial spatial = closest.getGeometry();
+			
+			if (spatial.getName().equals("Materializer") 
+					|| spatial.getName().equals("De-Materializer")
+					|| spatial.getName().equals("Redshifter")
+					|| spatial.getName().equals("Blueshifter")) {
+				return;
+			}
 			
 			bulletAppState.getPhysicsSpace().remove(spatial.getControl(RigidBodyControl.class));
 			spatial.removeControl(RigidBodyControl.class);
@@ -748,12 +802,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		lamp_key.setGenerateMips(true);
 		Texture lamp_texture = assetManager.loadTexture(lamp_key);
 		lamp_material.setTexture("DiffuseMap", lamp_texture);
-		
-		light_switch_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-		TextureKey light_switch_key = new TextureKey("glow.jpg");
-		light_switch_key.setGenerateMips(true);
-		Texture light_switch_texture = assetManager.loadTexture(light_switch_key);
-		light_switch_material.setTexture("DiffuseMap", light_switch_texture);
 	
 		PAL_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 		TextureKey PAL_key = new TextureKey("PAL9001.jpg");
@@ -1040,14 +1088,23 @@ public class Main extends SimpleApplication implements ActionListener {
 	}
 	
 	public void initLightSwitch() {
-		rootNode.attachChild(makeLightSwitch());
+		proximity.attachChild(makeLightSwitch("LightSwitchDim", "glow_dim.jpg", -97.8f, 5, 25));
+		proximity.attachChild(makeLightSwitch("LightSwitchWhite", "glow.jpg", -97.8f, 5, 24));
+		proximity.attachChild(makeLightSwitch("LightSwitchYellow", "glow_yellow.jpg", -97.8f, 5, 26));
+		proximity.attachChild(makeLightSwitch("LightSwitchRed", "glow_red.jpg", -97.8f, 5, 27));
+		proximity.attachChild(makeLightSwitch("LightSwitchGreen", "glow_green.jpg", -97.8f, 5, 28));
 	}
 	
-	private Geometry makeLightSwitch() {
-		Geometry light_switch_geometry = new Geometry("LightSwitch", light_switch);
+	private Geometry makeLightSwitch(String name, String texture_path, float trans_x, float trans_y, float trans_z) {
+		Box light_switch = new Box(0.2f, 0.2f, 0.2f);
+		Geometry light_switch_geometry = new Geometry(name, light_switch);
+		light_switch_geometry.setLocalTranslation(trans_x, trans_y, trans_z);
+		
+		Material light_switch_material = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+		Texture light_switch_texture = assetManager.loadTexture(texture_path);
+		light_switch_material.setTexture("DiffuseMap", light_switch_texture);
 		light_switch_geometry.setMaterial(light_switch_material);
-		light_switch_geometry.setLocalTranslation(-97.8f, 5, 20);
-				
+		
 		light_switch_geometry.setShadowMode(ShadowMode.Cast);
 	
 		light_switch_physical = new RigidBodyControl(0.0f);
@@ -1142,12 +1199,11 @@ public class Main extends SimpleApplication implements ActionListener {
 		motioncontrol1.setSpeed(0.5f);       
 	}
 	
-	// Crosshairs
+	// Crosshair
 	protected void initCrossHair() {
 		// Hiding stat box
 		setDisplayStatView(false);
 		
-		//guiNode.detachAllChildren();
 		guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
 		BitmapText crosshairs = new BitmapText(guiFont, false);
 		

@@ -4,19 +4,9 @@ Student project at Luleå Tekniska Universitet, for the course [M7002E - Compute
 
 The Assignments
 =======================
-- [Assignemnt 1](https://github.com/Wennberg/M7002E-Computer-Graphics/tree/master/src/assignment1)
-- [Assignemnt 2](https://github.com/Wennberg/M7002E-Computer-Graphics/tree/master/src/assignment2)
-- [Assignemnt 3](https://github.com/Wennberg/M7002E-Computer-Graphics/tree/master/src/assignment3)
-- [Assignemnt 4](https://github.com/Wennberg/M7002E-Computer-Graphics/tree/master/src/assignment4)
-
-To-Do List
-=======================
-#### Important
-
-#### Not-So-Important
-- Disable Camera Scrolling/Zoom
-
-
-
+- [Assignment 1](https://github.com/Wennberg/M7002E-Computer-Graphics/tree/master/src/assignment1)
+- [Assignment 2](https://github.com/Wennberg/M7002E-Computer-Graphics/tree/master/src/assignment2)
+- [Assignment 3](https://github.com/Wennberg/M7002E-Computer-Graphics/tree/master/src/assignment3)
+- [Assignment 4](https://github.com/Wennberg/M7002E-Computer-Graphics/tree/master/src/assignment4)
 
 
