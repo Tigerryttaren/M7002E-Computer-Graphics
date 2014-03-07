@@ -1,7 +1,6 @@
 package assignment4;
  
 import java.util.UUID;
-
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioNode;
@@ -66,31 +65,31 @@ public class Main extends SimpleApplication implements ActionListener {
 	private BulletAppState bulletAppState;	
 	
 	private Node manipulatables;
-    private Node inventory;
-    private Node announcer;
-    private Node proximity;
-    private Node proximity_text;
-    private Node proximity_light_switch_text;
-    
-    private Picture PAL_mode;
-    
-    private int camera_position = 0;
-    private Vector3f last_player_camera_direction;
-    private Vector3f last_PAL_camera_direction = new Vector3f(15f,  0f, 0f);
+	private Node inventory;
+	private Node announcer;
+	private Node proximity;
+	private Node proximity_text;
+	private Node proximity_light_switch_text;
+	
+	private Picture PAL_mode;
+	
+	private int camera_position = 0;
+	private Vector3f last_player_camera_direction;
+	private Vector3f last_PAL_camera_direction = new Vector3f(15f,  0f, 0f);
 
-    private Vector3f last_scale;
-    private RigidBodyControl last_physical;
-    
-    private PointLight light_ceiling;
-    private PointLight light_PAL;
-    
-    private AudioNode audio_PAL_cantdo;
-    private AudioNode audio_PAL_well;
-        
-    private boolean contact_PAL_cantdo = false;
-    private boolean contact_PAL_well = false;
-    private boolean ceiling_light_on = true;
-    
+	private Vector3f last_scale;
+	private RigidBodyControl last_physical;
+	
+	private PointLight light_ceiling;
+	private PointLight light_PAL;
+	
+	private AudioNode audio_PAL_cantdo;
+	private AudioNode audio_PAL_well;
+	
+	private boolean contact_PAL_cantdo = false;
+	private boolean contact_PAL_well = false;
+	private boolean ceiling_light_on = true;
+	
 	Material ground_material;
 	Material ceiling_material;	
 	Material wall_material;
@@ -214,7 +213,6 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 	@Override
 	public void simpleUpdate(float tpf) {
-		
 		// Setting the camera
 		camera_direction.set(cam.getDirection()).multLocal(0.6f);
 		camera_left.set(cam.getLeft()).multLocal(0.4f);
@@ -764,14 +762,14 @@ public class Main extends SimpleApplication implements ActionListener {
 		
 		PointLightShadowRenderer plsr_ceiling = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
 		plsr_ceiling.setLight(light_ceiling);
-        
-        plsr_ceiling.setFlushQueues(false);
-        
-        PointLightShadowRenderer plsr_PAL = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
-        plsr_PAL.setLight(light_PAL);
-        
-        viewPort.addProcessor(plsr_ceiling);
-        viewPort.addProcessor(plsr_PAL);
+
+		plsr_ceiling.setFlushQueues(false);
+
+		PointLightShadowRenderer plsr_PAL = new PointLightShadowRenderer(assetManager, SHADOWMAP_SIZE);
+		plsr_PAL.setLight(light_PAL);
+		
+		viewPort.addProcessor(plsr_ceiling);
+		viewPort.addProcessor(plsr_PAL);
 	}
  
 	// Materials used in the scene

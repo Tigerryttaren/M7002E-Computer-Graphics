@@ -1,7 +1,7 @@
 Assignment 4
 =======================
 ### Introduction To Situation
-You are Dave, a newborn age-acceletrated synthetic human being. You goal is to learn some basic motor skills and throw stuff around, while learing how to operate the **R.O.D.S.** or **R**od-like **O**bject of **D**oing **S**tuff. The sinister and ever-helpful PAL9001, **P**ropably-evil **AL**gorithmic computer model **9001**, is watching your every move. Have a nice day.
+You are Dave, a newborn age-acceletrated synthetic human being. You goal is to learn some basic motor skills and throw stuff around, while learing how to operate the **R.O.D.S.** or **R**od-like **O**bject of **D**oing **S**tuff. The ever-helpful **PAL9001**, **P**ropably-evil **AL**gorithmic computer model **9001**, is evaluating your every move. Have a nice first day!
 
 ### Disclaimer
 The controls and the general player concept was inspired from the **HelloCollisions.java** example, and crosshairs were taken pretty straight off from **HelloPhysics.java**. The **HelloPicking.java** example was used for learning how to do picking.
@@ -9,19 +9,19 @@ The controls and the general player concept was inspired from the **HelloCollisi
 This hilariously monolithic file could and propbably should be split up in several smaller files for readability, but so far, it has not turn out that way ;-)
 
 ### Required Features Implemented
-##### Supports Egocentric Locomotion
+#### Supports Egocentric Locomotion
 The concept of a player, who can move around, is affected by gravity, can manipulate his environment and more is supported.
 
-##### Direct Picking
+#### Direct Picking
 Direct selection is implemented. The player has the ability to aim at an object and select it. In this "game", there is no selection marker, and according to me, your humble developer, the crosshairs are well and enough.
 
-##### (At Least) Two Point of Views
+#### (At Least) Two Point of Views
 The user can switch camera view between the player character and the evil surveilance eye of PAL9001.
 
-##### Look Somewhat Natural
+#### Look Somewhat Natural
 Utilizing pretty textures from the internet and rudimentary physics, the scene looks and feels at least somewhat natural. Also, acceptably realistic shadows are used. 
 
-##### Command Palette
+#### Command Palette
 The way the user controls his environment is through objects. Pick one up, use the **USE** key and watch something happen. Rinse, and repeat.
 
 ### Possible Extra Features Implemented
@@ -59,11 +59,11 @@ This bright *red* rod has the supremely awesome power to enlarge objects simply 
 ##### The Blueshifter
 This somberly *blue* rod has the power to shrink objects. As its red twin, the name is inspired from the blueshift of the Doppler effect on electromagnetic waves. Also known as The Shrinker.
 
-##### Light Switch
-To the left of PAL9001 there is a light switch panel on the wall. When the user walks up to them and presses the **E** key, the light switches mode, or color.
-
 ##### BioBoxes
 These small red boxes containing extremely hazardous biological waste can be tossed around in an playful manner, but cannot really be used as anything other than a building block. Use them to climb the larger yellow boxes! Oh, the fun!
+
+#### Light Switch
+To the left of PAL9001 there is a light switch panel on the wall. When the user walks up to them and presses the **E** key, the light switches mode, or color.
 
 #### Switching Point of View
 Use the **TAB** key to switch between the point of view of the player and the point of view of PAL9001.
